@@ -30,4 +30,3 @@ srt_file = 'breakingbads02e01VF.srt'
 
 # Exemple d'utilisation
 extract_words_from_srt(srt_file, 'output_csv.csv')
-print("")
