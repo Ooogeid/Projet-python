@@ -10,9 +10,6 @@ def extract_words_from_srt(input_file, output_csv):
     with open(input_file, 'r', encoding='latin-1') as file:
         srt_content = file.read()
     
-    # Supprimer les numéros de séquence et horodatages
-    # srt_content = re.sub(r'\d+\n', '', srt_content)
-    
     # Remplacer les caractères de ponctuation par des espaces et diviser en mots
     words = re.findall(r'\b\w+\b', srt_content.lower())  # Utilisez lower() pour tout mettre en minuscules
 
@@ -26,19 +23,6 @@ def extract_words_from_srt(input_file, output_csv):
         for word, count in word_count.items():
             csv_writer.writerow([word, count])
     
-"""
-root_directory_vo = 'sous-titres/breakingbadvo'
-root_directory_vf = 'sous-titres/breakingbadvf'
-
-for root, _, files in os.walk(root_directory_vo):
-    for file in files:
-        print(os.path.join(root, file))
-        extract_words_from_srt(os.path.join(root, file), 'breakingbadvo.csv')
-
-for root, _, files in os.walk(root_directory_vf):
-    for file in files:
-        print(os.path.join(root, file))
-        extract_words_from_srt(os.path.join(root, file), 'breakingbadvf.csv')"""
 
 # Charger les deux fichiers CSV dans des DataFrames
 breakingbadvo = pd.read_csv('breakingbadvo.csv', encoding='latin-1')
