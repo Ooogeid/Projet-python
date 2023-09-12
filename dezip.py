@@ -1,27 +1,17 @@
 import os
-import zipfile
-from py7zr import SevenZipFile
-from rarfile import RarFile
+from pyunpack import Archive
 
 def extraire_fichiers_archive(repertoire):
     for dossier in os.listdir(repertoire):
         chemin_dossier = os.path.join(repertoire, dossier)
         if os.path.isdir(chemin_dossier):
-            fichiers_archive = [fichier for fichier in os.listdir(chemin_dossier) if fichier.endswith(('.zip', '.7z', '.rar'))]
+            fichiers_archive = [fichier for fichier in os.listdir(chemin_dossier) if fichier.endswith(('.zip', '.rar', '.7z'))]
             if fichiers_archive:
                 print(f"Extraction des fichiers d'archive dans le dossier '{dossier}'...")
                 for fichier_archive in fichiers_archive:
                     chemin_fichier_archive = os.path.join(chemin_dossier, fichier_archive)
                     try:
-                        if fichier_archive.endswith('.zip'):
-                            with zipfile.ZipFile(chemin_fichier_archive, 'r') as zip_ref:
-                                zip_ref.extractall(chemin_dossier)
-                        elif fichier_archive.endswith('.7z'):
-                            with SevenZipFile(chemin_fichier_archive, mode='r') as seven_zip:
-                                seven_zip.extractall(path=chemin_dossier)
-                        elif fichier_archive.endswith('.rar'):
-                            with RarFile(chemin_fichier_archive, 'r') as rar_ref:
-                                rar_ref.extractall(path=chemin_dossier)
+                        Archive(chemin_fichier_archive).extractall(chemin_dossier)
                         os.remove(chemin_fichier_archive)
                         print(f"Extraction réussie pour le fichier '{fichier_archive}'")
                     except Exception as e:
@@ -31,7 +21,7 @@ def extraire_fichiers_archive(repertoire):
 def supprimer_fichiers_archive(repertoire):
     for dossier, sous_dossiers, fichiers in os.walk(repertoire):
         for fichier in fichiers:
-            if fichier.endswith(('.zip', '.7z', '.rar')):
+            if fichier.endswith(('.zip', '.rar', '.7z')):
                 chemin_fichier_archive = os.path.join(dossier, fichier)
                 try:
                     os.remove(chemin_fichier_archive)
