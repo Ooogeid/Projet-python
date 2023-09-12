@@ -45,7 +45,7 @@ def process_series(root_directory, output_csv):
     df_sorted = df.sort_values(by='Occurrence', ascending=False)
 
     # Enregistrer le DataFrame trié dans le fichier CSV
-    df_sorted.to_csv(output_csv, index=False, encoding='utf-8')
+    df_sorted.to_csv(output_csv, index=False, encoding='latin-1')
 
 def main():
     series_directory = '../sous-titres'
