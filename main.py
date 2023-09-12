@@ -4,6 +4,7 @@ import os
 from collections import defaultdict
 import pandas as pd
 
+# Fonction pour extraire les mots d'un fichier SRT, les compter et les stocker dans un dictionnaire
 def extract_words_from_srt(input_file):
     word_count = defaultdict(int)
 
@@ -19,30 +20,48 @@ def extract_words_from_srt(input_file):
 
     return word_count  # Retournez un dictionnaire de mots et occurrences
 
-root_directory = '../sous-titres/breakingbad' 
+# Fonction pour traiter une série
+def process_series(root_directory, output_csv):
+    # Dictionnaire pour stocker les occurrences de mots pour chaque épisode
+    word_counts = defaultdict(int)
 
-# Dictionnaire pour stocker les occurrences de mots pour chaque épisode
-word_counts = defaultdict(int)
+    # Se position dans cahqu dossier de saison
+    for root, _, files in os.walk(root_directory):
+        for file in files:
+            word_count = extract_words_from_srt(os.path.join(root, file))
+            for word, count in word_count.items():
+                word_counts[word] += count
 
-# Walk through all directories and subdirectories
-for root, _, files in os.walk(root_directory):
-    # Print the list of files in the current directory
-    for file in files:
-        word_count = extract_words_from_srt(os.path.join(root, file))
-        for word, count in word_count.items():
-            word_counts[word] += count
+    # Enregistrez les mots et leurs occurrences dans le fichier CSV de sortie
+    with open(output_csv, 'w', newline='', encoding='latin-1') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(['Mot', 'Occurrence'])
+        for word, count in word_counts.items():
+            csv_writer.writerow([word, count])
 
-# Enregistrez les mots et leurs occurrences dans votre fichier CSV de sortie
-output_csv = '../csv/breakingbad.csv'
-with open(output_csv, 'w', newline='', encoding='latin-1') as csv_file:
-    csv_writer = csv.writer(csv_file)
-    csv_writer.writerow(['Mot', 'Occurrence'])
-    for word, count in word_counts.items():
-        csv_writer.writerow([word, count])
+    df = pd.read_csv(output_csv, encoding='latin-1')
 
-df = pd.read_csv('../csv/breakingbad.csv', encoding='latin-1')
+    # Trier le DataFrame par ordre décroissant d'occurrence
+    df_sorted = df.sort_values(by='Occurrence', ascending=False)
 
-# Trier le DataFrame par ordre décroissant d'occurrence
-df_sorted = df.sort_values(by='Occurrence', ascending=False)
+    # Enregistrer le DataFrame trié dans le fichier CSV
+    df_sorted.to_csv(output_csv, index=False, encoding='latin-1')
 
-df_sorted.to_csv(output_csv, index=False, encoding='latin-1')
+def main():
+    series_directory = '../sous-titres'
+    output_directory = '../csv'
+
+    # Parcourir tous les dossiers de séries dans le répertoire de séries
+    for series_folder in os.listdir(series_directory):
+        if os.path.isdir(os.path.join(series_directory, series_folder)):
+            # Construire le chemin d'accès pour le dossier de la série
+            series_path = os.path.join(series_directory, series_folder)
+            
+            # Construire le chemin de sortie CSV pour la série
+            output_csv = os.path.join(output_directory, f'{series_folder}.csv')
+
+            # Traiter la série
+            process_series(series_path, output_csv)
+
+if __name__ == "__main__":
+    main()
