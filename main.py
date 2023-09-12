@@ -1,6 +1,5 @@
 import csv
 import re
-import os
 from collections import defaultdict
 import pandas as pd
 
@@ -24,12 +23,5 @@ def extract_words_from_srt(input_file, output_csv):
             csv_writer.writerow([word, count])
     
 
-# Charger les deux fichiers CSV dans des DataFrames
-breakingbadvo = pd.read_csv('breakingbadvo.csv', encoding='latin-1')
-breakingbadvf = pd.read_csv('breakingbadvf.csv', encoding='latin-1')
-
-# Concaténer les DataFrames verticalement (ajouter un DataFrame en dessous de l'autre)
-concatenated_df = pd.concat([breakingbadvo, breakingbadvf], ignore_index=True)
-
-# Écrire le DataFrame concaténé dans un nouveau fichier CSV
-concatenated_df.to_csv('breakingbad.csv', index=False)
+breakingbad = pd.read_csv('../csv/breakingbad.csv', encoding='latin-1')
+extract_words_from_srt('../sous-titres/breakingbad.srt', breakingbad)
