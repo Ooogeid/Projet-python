@@ -25,9 +25,8 @@ def process_series(root_directory, output_csv):
     # Dictionnaire pour stocker les occurrences de mots pour chaque épisode
     word_counts = defaultdict(int)
 
-    # Walk through all directories and subdirectories
+    # Se position dans cahqu dossier de saison
     for root, _, files in os.walk(root_directory):
-        # Print the list of files in the current directory
         for file in files:
             word_count = extract_words_from_srt(os.path.join(root, file))
             for word, count in word_count.items():
