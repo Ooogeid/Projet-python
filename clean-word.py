@@ -31,7 +31,7 @@ def clean_word(word):
     return " ".join(cleaned_word)
 
 # Charger le fichier CSV d'origine
-data = pd.read_csv("../csv/90210/90210_vo.csv", sep=";", encoding='latin-1')
+data = pd.read_csv("csv/90210/90210_vo.csv", sep=";", encoding='latin-1')
 
 # Initialiser un dictionnaire pour stocker les occurrences agrégées des mots nettoyés
 word_counts = defaultdict(int)
