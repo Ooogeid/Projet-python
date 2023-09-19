@@ -24,14 +24,11 @@ def clean_word(word):
                 verb_occurrences[infinitive] += 1
                 # Ajouter l'infinitif au mot nettoyé
                 cleaned_word.append(infinitive)
-            else:
-                # Pour les autres parties du discours, utiliser la lemmatisation
-                cleaned_word.append(token.lemma_)
 
     return " ".join(cleaned_word)
 
 # Charger le fichier CSV d'origine
-data = pd.read_csv("../csv/90210/90210_vo.csv", sep=";", encoding='latin-1')
+data = pd.read_csv("../csv/90210/90210_vo_test.csv", sep=";", encoding='latin-1')
 
 # Initialiser un dictionnaire pour stocker les occurrences agrégées des mots nettoyés
 word_counts = defaultdict(int)
@@ -44,8 +41,10 @@ for index, row in data.iterrows():
     # Nettoyer le mot
     cleaned_word = clean_word(word)
 
-    # Ajouter le mot nettoyé et ses occurrences au dictionnaire
-    word_counts[cleaned_word] += count
+    # Ignorer les mots uniques (une seule lettre)
+    if len(cleaned_word) > 1:
+        # Ajouter le mot nettoyé et ses occurrences au dictionnaire
+        word_counts[cleaned_word] += count
 
 # Créer un nouveau DataFrame à partir du dictionnaire
 cleaned_data = pd.DataFrame({"Mot": list(word_counts.keys()), "Occurrence": list(word_counts.values())})
