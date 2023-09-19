@@ -21,31 +21,44 @@ def extract_words_from_srt(input_file):
     return word_count  # Retournez un dictionnaire de mots et occurrences
 
 # Fonction pour traiter une série
-def process_series(root_directory, output_csv):
-    # Dictionnaire pour stocker les occurrences de mots pour chaque épisode
-    word_counts = defaultdict(int)
+def process_series(root_directory, output_csv_directory):
+    # Dictionnaires pour stocker les occurrences de mots pour chaque épisode (VO et VF)
+    word_counts_vf = defaultdict(int)
+    word_counts_vo = defaultdict(int)
 
-    # Se position dans cahqu dossier de saison
+    # Se positionner dans chaque dossier de saison
     for root, _, files in os.walk(root_directory):
+        language = 'Inconnu'  
         for file in files:
-            word_count = extract_words_from_srt(os.path.join(root, file))
-            for word, count in word_count.items():
-                word_counts[word] += count
+            if 'VO' in file:
+                language = 'Anglais'
+            elif 'VF' in file:
+                language = 'Français'
 
-    # Enregistrez les mots et leurs occurrences dans le fichier CSV de sortie
-    with open(output_csv, 'w', newline='', encoding='latin-1') as csv_file:
-        csv_writer = csv.writer(csv_file)
+            word_count = extract_words_from_srt(os.path.join(root, file))
+
+            if language == 'Anglais':
+                for word, count in word_count.items():
+                    word_counts_vo[word] += count
+            elif language == 'Français':
+                for word, count in word_count.items():
+                    word_counts_vf[word] += count
+
+    # Enregistrez les mots et leurs occurrences dans le fichier CSV de sortie (VO)
+    output_csv_vo = os.path.join(output_csv_directory, f'{os.path.basename(root_directory)}_vo.csv')
+    with open(output_csv_vo, 'w', newline='', encoding='latin-1') as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=';')
         csv_writer.writerow(['Mot', 'Occurrence'])
-        for word, count in word_counts.items():
+        for word, count in word_counts_vo.items():
             csv_writer.writerow([word, count])
 
-    df = pd.read_csv(output_csv, encoding='latin-1')
-
-    # Trier le DataFrame par ordre décroissant d'occurrence
-    df_sorted = df.sort_values(by='Occurrence', ascending=False)
-
-    # Enregistrer le DataFrame trié dans le fichier CSV
-    df_sorted.to_csv(output_csv, index=False, encoding='latin-1')
+    # Enregistrez les mots et leurs occurrences dans le fichier CSV de sortie (VF)
+    output_csv_vf = os.path.join(output_csv_directory, f'{os.path.basename(root_directory)}_vf.csv')
+    with open(output_csv_vf, 'w', newline='', encoding='latin-1') as csv_file:
+        csv_writer = csv.writer(csv_file, delimiter=';')
+        csv_writer.writerow(['Mot', 'Occurrence'])
+        for word, count in word_counts_vf.items():
+            csv_writer.writerow([word, count])
 
 def main():
     series_directory = '../sous-titres'
@@ -57,11 +70,14 @@ def main():
             # Construire le chemin d'accès pour le dossier de la série
             series_path = os.path.join(series_directory, series_folder)
             
-            # Construire le chemin de sortie CSV pour la série
-            output_csv = os.path.join(output_directory, f'{series_folder}.csv')
+            # Construire le chemin de sortie pour le dossier CSV de la série
+            output_csv_directory = os.path.join(output_directory, series_folder)
+
+            # Créez le dossier de sortie s'il n'existe pas
+            os.makedirs(output_csv_directory, exist_ok=True)
 
             # Traiter la série
-            process_series(series_path, output_csv)
+            process_series(series_path, output_csv_directory)
 
 if __name__ == "__main__":
     main()
