@@ -23,7 +23,7 @@ def clean_word(word):
 def clean_with_cluster(input_csv_path, output_csv_path):
     # Charger le fichier CSV d'origine
     data = pd.read_csv(input_csv_path, sep=";", encoding='latin-1')
-
+    data = data[data['Mot'].apply(lambda x: isinstance(x, str))]
     # Nettoyer et lemmatiser les mots
     data['Mot_nettoye'] = data['Mot'].apply(clean_word)
 
