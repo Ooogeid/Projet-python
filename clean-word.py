@@ -3,7 +3,7 @@ import pandas as pd
 from collections import defaultdict
 
 # Créer un dictionnaire pour stocker les occurrences de chaque forme à l'infinitif
-pos_a_exclure = ['SYM', 'X', 'NUM', 'PRON', 'DET', 'CCONJ', 'ADP', 'ADJ', 'AUX']
+pos_a_exclure = ['SYM', 'X', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'ADJ', 'AUX', 'ADV', 'PRT', 'SPACE']
 
 nlp = spacy.load("en_core_web_sm")
 
