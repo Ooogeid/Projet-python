@@ -1,15 +1,46 @@
-'''
 import spacy
 import pandas as pd
+import transformers
 from collections import defaultdict
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 
-# Charger le modèle SpaCy
-nlp = spacy.load("en_core_web_sm")
+#from transformers import CamembertForMaskedLM, CamembertTokenizer
+
+#tokenizer = CamembertTokenizer.from_pretrained("camembert-base")
+#model = CamembertForMaskedLM.from_pretrained("camembert-base")
+#model.eval()
+
+#from spacy_transformers import TransformersLanguage, TransformersWordPiecer, TransformersTok2Vec
+# Téléchargez le modèle CamemBERT pré-entraîné
+#model_name = "camembert-base"
+#tokenizer = transformers.CamembertTokenizer.from_pretrained(model_name)
+#model = transformers.CamembertModel.from_pretrained(model_name)
+
+# Vous pouvez ensuite l'utiliser pour le traitement du texte en français
+
+# Créez un objet nlp avec le modèle CamemBERT
+#nlp = TransformersLanguage(trf_name="camembert-base")
+
+# Ajoutez les composants de pipeline pour la tokenization et le marquage grammatical
+#nlp.add_pipe(TransformersWordPiecer.from_pretrained(nlp.vocab, "camembert-base"))
+#nlp.add_pipe(TransformersTok2Vec.from_pretrained(nlp.vocab, "camembert-base"))
+
+# Traitez le texte en utilisant le pipeline SpaCy avec CamemBERT
+#doc = nlp("Votre texte en français ici.")
+
+#import torch
+#from transformers.modeling_camembert import CamembertForMaskedLM
+#from transformers.tokenization_camembert import CamembertTokenizer
+
+#camembert = torch.hub.load('pytorch/fairseq', 'camembert')
+#camembert.eval()  # disable dropout (or leave in train mode to finetune)
+
+#Charger le modèle SpaCy
+nlp = spacy.load("fr_core_news_sm")
 
 # Charger le fichier CSV d'origine
-data = pd.read_csv("../csv/90210/90210_vo_test.csv", sep=";", encoding='latin-1')
+data = pd.read_csv("../csv/bones/bones_vf.csv", sep=";", encoding='latin-1')
 
 # Nettoyer et lemmatiser les mots
 def clean_word(word):
@@ -23,75 +54,7 @@ def clean_word(word):
 
     return " ".join(cleaned_word)
 
-# Appliquer la fonction de nettoyage aux données
-data['Mot_nettoye'] = data['Mot'].apply(clean_word)
-
-# Supprimer les lignes où le mot nettoyé est vide
-data = data[data['Mot_nettoye'] != '']
-
-# Vectorisation des mots nettoyés
-tfidf_vectorizer = TfidfVectorizer()
-tfidf_matrix = tfidf_vectorizer.fit_transform(data['Mot_nettoye'])
-
-# Clustering avec K-Means
-kmeans = KMeans(n_clusters=3)  # Spécifiez le nombre de clusters souhaité
-data['Cluster'] = kmeans.fit_predict(tfidf_matrix)
-
-# Créer un DataFrame pour conserver les occurrences de chaque mot par cluster
-word_occurrences = pd.DataFrame(columns=['Mot', 'Cluster', 'Occurrence'])
-
-# Parcourir les lignes du DataFrame
-for index, row in data.iterrows():
-    word = row["Mot"]
-    count = row["Occurrence"]
-    cluster = row["Cluster"]
-
-    # Ajouter le mot, le cluster et l'occurrence au DataFrame
-    word_occurrences = word_occurrences.append({'Mot': word, 'Cluster': cluster, 'Occurrence': count}, ignore_index=True)
-
-# Créer une liste de dictionnaires pour stocker les données
-data_to_append = []
-
-# Parcourir les lignes du DataFrame
-for index, row in data.iterrows():
-    word = row["Mot"]
-    count = row["Occurrence"]
-    cluster = row["Cluster"]
-
-    # Ajouter les données sous forme de dictionnaire à la liste
-    data_to_append.append({'Mot': word, 'Cluster': cluster, 'Occurrence': count})
-
-# Créer un DataFrame à partir de la liste de dictionnaires
-word_occurrences = pd.DataFrame(data_to_append)
-
-# Enregistrer le résultat dans un nouveau fichier CSV
-word_occurrences.to_csv("resultat_word_occurrences.csv", sep=";", index=False, encoding='latin-1')    
-'''
-
-import spacy
-import pandas as pd
-from collections import defaultdict
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-
-# Charger le modèle SpaCy
-nlp = spacy.load("en_core_web_sm")
-
-# Charger le fichier CSV d'origine
-data = pd.read_csv("../csv/bones/bones_vo.csv", sep=";", encoding='latin-1')
-
-# Nettoyer et lemmatiser les mots
-def clean_word(word):
-    word = word.lower()
-    doc = nlp(word)
-    cleaned_word = []
-
-    for token in doc:
-        if not token.is_stop and token.is_alpha and not token.is_punct and not token.is_space:
-            cleaned_word.append(token.lemma_)
-
-    return " ".join(cleaned_word)
-
+data = data[data['Mot'].apply(lambda x: isinstance(x, str))]
 data['Mot_nettoye'] = data['Mot'].apply(clean_word)
 
 # Vectorisation des mots nettoyés
