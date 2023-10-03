@@ -56,17 +56,17 @@ def clean_with_cluster(input_csv_path, output_csv_path):
     clustered_data = pd.read_csv(output_csv_path, sep=";", encoding='latin-1')
 
     # Création d'une nouvelle colonne "Cluster_occurrence" pour stocker la somme des occurrences par mot
-    clustered_data['Cluster_occurrence'] = clustered_data.groupby('Mot_nettoye')['Occurrence'].transform('sum')
+    clustered_data['Poids'] = clustered_data.groupby('Mot_nettoye')['Occurrence'].transform('sum')
 
     # Supprimer les colonnes "Mot", "Occurrence" et "Cluster"
     clustered_data = clustered_data.drop(columns=['Mot', 'Occurrence', 'Cluster'])
 
     # Remplacer les valeurs non finies (NaN et inf) par des zéros dans la colonne "Cluster_occurrence"
-    clustered_data['Cluster_occurrence'].fillna(0, inplace=True)
-    clustered_data['Cluster_occurrence'] = clustered_data['Cluster_occurrence'].replace([np.inf, -np.inf], 0)
+    clustered_data['Poids'].fillna(0, inplace=True)
+    clustered_data['Poids'] = clustered_data['Poids'].replace([np.inf, -np.inf], 0)
 
     # Convertir la colonne "Cluster_occurrence" en int
-    clustered_data['Cluster_occurrence'] = clustered_data['Cluster_occurrence'].astype(int)
+    clustered_data['Poidss'] = clustered_data['Poids'].astype(int)
 
     # Tri du DataFrame par la colonne "Mot_nettoye" en ordre croissant
     clustered_data = clustered_data.sort_values(by='Mot_nettoye')
