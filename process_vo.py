@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 
 # Charger le modèle SpaCy
 nlp = spacy.load("en_core_web_sm")
-pos_a_exclure = ['SYM', 'X', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'ADJ', 'AUX', 'ADV', 'PRT', 'SPACE']
+pos_a_exclure = ['SYM', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'ADJ', 'AUX', 'ADV', 'PRT', 'SPACE']
 
 # Fonction pour nettoyer et lemmatiser les mots
 def clean_word(word):
