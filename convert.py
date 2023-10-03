@@ -2,7 +2,7 @@ import csv
 import re
 import os
 from collections import defaultdict
-import pandas as pd
+from langdetect import detect
 
 # Fonction pour extraire les mots d'un fichier SRT, les compter et les stocker dans un dictionnaire
 def extract_words_from_srt(input_file):
@@ -17,7 +17,7 @@ def extract_words_from_srt(input_file):
     for word in words:
         if not word.isdigit():  # Exclure les mots composés uniquement de chiffres
             word_count[word] += 1
-
+    
     return word_count  # Retournez un dictionnaire de mots et occurrences
 
 # Fonction pour traiter une série
@@ -25,15 +25,23 @@ def process_series(root_directory, output_csv_directory):
     # Dictionnaires pour stocker les occurrences de mots pour chaque épisode (VO et VF)
     word_counts_vf = defaultdict(int)
     word_counts_vo = defaultdict(int)
-
+    
     # Se positionner dans chaque dossier de saison
     for root, _, files in os.walk(root_directory):
-        language = 'Inconnu'  
         for file in files:
-            if 'VO' in file:
-                language = 'Anglais'
-            elif 'VF' in file:
+
+            file_path = os.path.join(root, file)
+            print(file_path)
+            with open(file_path, 'r', encoding='latin-1', errors='ignore') as f:
+                contenu = f.read()
+            
+            if contenu.strip():
+                langue = detect(contenu)
+            
+            if langue == "fr":
                 language = 'Français'
+            else:
+                language = 'Anglais'
 
             word_count = extract_words_from_srt(os.path.join(root, file))
 
@@ -43,6 +51,8 @@ def process_series(root_directory, output_csv_directory):
             elif language == 'Français':
                 for word, count in word_count.items():
                     word_counts_vf[word] += count
+
+        print(len(word_counts_vo.keys()))
 
     # Enregistrez les mots et leurs occurrences dans le fichier CSV de sortie (VO)
     output_csv_vo = os.path.join(output_csv_directory, f'{os.path.basename(root_directory)}_vo.csv')
@@ -69,7 +79,6 @@ def main():
         if os.path.isdir(os.path.join(series_directory, series_folder)):
             # Construire le chemin d'accès pour le dossier de la série
             series_path = os.path.join(series_directory, series_folder)
-            
             # Construire le chemin de sortie pour le dossier CSV de la série
             output_csv_directory = os.path.join(output_directory, series_folder)
 
@@ -78,6 +87,7 @@ def main():
 
             # Traiter la série
             process_series(series_path, output_csv_directory)
+            print(f"Processed series: {series_folder}")
 
 if __name__ == "__main__":
     main()
