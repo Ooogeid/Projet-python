@@ -6,6 +6,7 @@ from sklearn.cluster import KMeans
 
 # Charger le modèle SpaCy
 nlp = spacy.load("en_core_web_sm")
+pos_a_exclure = ['SYM', 'X', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'ADJ', 'AUX', 'ADV', 'PRT', 'SPACE']
 
 # Fonction pour nettoyer et lemmatiser les mots
 def clean_word(word):
@@ -15,7 +16,8 @@ def clean_word(word):
 
     for token in doc:
         if not token.is_stop and token.is_alpha and not token.is_punct and not token.is_space:
-            cleaned_word.append(token.lemma_)
+            if token.pos_ not in pos_a_exclure:
+                cleaned_word.append(token.lemma_)
 
     return " ".join(cleaned_word)
 
