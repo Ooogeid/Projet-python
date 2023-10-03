@@ -66,7 +66,7 @@ def clean_with_cluster(input_csv_path, output_csv_path):
     clustered_data['Poids'] = clustered_data['Poids'].replace([np.inf, -np.inf], 0)
 
     # Convertir la colonne "Cluster_occurrence" en int
-    clustered_data['Poidss'] = clustered_data['Poids'].astype(int)
+    clustered_data['Poids'] = clustered_data['Poids'].astype(int)
 
     # Tri du DataFrame par la colonne "Mot_nettoye" en ordre croissant
     clustered_data = clustered_data.sort_values(by='Mot_nettoye')
