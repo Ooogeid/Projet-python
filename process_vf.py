@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 # Créer un dictionnaire pour stocker les occurrences de chaque forme à l'infinitif
-pos_a_exclure = ['SYM', 'X', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'ADJ', 'AUX', 'ADV', 'PRT', 'SPACE']
+pos_a_exclure = ['SYM', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'ADJ', 'AUX', 'ADV', 'PRT', 'SPACE']
 
 # Charger le modèle SpaCy
 nlp = spacy.load("fr_core_news_sm")
@@ -28,6 +28,12 @@ def clean_word(word):
 def clean_with_cluster(input_csv_path, output_csv_path):
     # Charger le fichier CSV d'origine
     data = pd.read_csv(input_csv_path, sep=";", encoding='latin-1')
+
+    # Vérifier si le csv ne contient que Mot et Occurence car si c'est le cas aucun traitement n'est possible
+    if list(data.columns) == ["Mot", "Occurrence"] and len(data.columns) == 2 and len(data) < 1:
+        print(f"Le fichier {input_csv_path} contient les en-têtes attendus. Aucun traitement n'est effectué.")
+        return
+
     data = data[data['Mot'].apply(lambda x: isinstance(x, str))]
     # Nettoyer et lemmatiser les mots
     data['Mot_nettoye'] = data['Mot'].apply(clean_word)
@@ -81,7 +87,7 @@ def process_series(series_directory, output_directory):
             input_csv_path = os.path.join(series_directory, filename)
             print("Processing file: " + filename)
             # Construire le nom de fichier de sortie en ajoutant "_clusters" au nom du fichier
-            output_filename = os.path.splitext(filename)[0] + "_clusters_test.csv"
+            output_filename = os.path.splitext(filename)[0] + "_clusters.csv"
             output_csv_path = os.path.join(output_directory, output_filename)
 
             # Appeler la fonction de nettoyage avec clustering
