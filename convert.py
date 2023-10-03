@@ -52,7 +52,7 @@ def process_series(root_directory, output_csv_directory):
                 for word, count in word_count.items():
                     word_counts_vf[word] += count
 
-        print(len(word_counts_vo.keys()))
+
 
     # Enregistrez les mots et leurs occurrences dans le fichier CSV de sortie (VO)
     output_csv_vo = os.path.join(output_csv_directory, f'{os.path.basename(root_directory)}_vo.csv')
