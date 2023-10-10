@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
+import numpy as np
 
 # Charger le modèle SpaCy
 nlp = spacy.load("en_core_web_sm")
@@ -25,6 +26,12 @@ def clean_word(word):
 def clean_with_cluster(input_csv_path, output_csv_path):
     # Charger le fichier CSV d'origine
     data = pd.read_csv(input_csv_path, sep=";", encoding='latin-1')
+
+    # Vérifier si le csv ne contient que Mot et Occurence car si c'est le cas aucun traitement n'est possible
+    if list(data.columns) == ["Mot", "Occurrence"] and len(data.columns) == 2 and len(data) < 1:
+        print(f"Le fichier {input_csv_path} contient les en-têtes attendus. Aucun traitement n'est effectué.")
+        return
+
     data = data[data['Mot'].apply(lambda x: isinstance(x, str))]
     # Nettoyer et lemmatiser les mots
     data['Mot_nettoye'] = data['Mot'].apply(clean_word)
@@ -46,18 +53,18 @@ def clean_with_cluster(input_csv_path, output_csv_path):
     # Lire le nouveau fichier avec les clusters
     clustered_data = pd.read_csv(output_csv_path, sep=";", encoding='latin-1')
 
-    # Création d'une nouvelle colonne "Cluster_occurrence" pour stocker la somme des occurrences par mot
-    clustered_data['Cluster_occurrence'] = clustered_data.groupby('Mot_nettoye')['Occurrence'].transform('sum')
+    # Création d'une nouvelle colonne "Poids" pour stocker la somme des occurrences par mot
+    clustered_data['Poids'] = clustered_data.groupby('Mot_nettoye')['Occurrence'].transform('sum')
 
     # Supprimer les colonnes "Mot", "Occurrence" et "Cluster"
     clustered_data = clustered_data.drop(columns=['Mot', 'Occurrence', 'Cluster'])
 
     # Remplacer les valeurs non finies (NaN et inf) par des zéros dans la colonne "Cluster_occurrence"
-    clustered_data['Cluster_occurrence'].fillna(0, inplace=True)
-    clustered_data['Cluster_occurrence'] = clustered_data['Cluster_occurrence'].replace([pd.np.inf, -pd.np.inf], 0)
+    clustered_data['Poids'].fillna(0, inplace=True)
+    clustered_data['Poids'] = clustered_data['Poids'].replace([np.inf, -np.inf], 0)
 
-    # Convertir la colonne "Cluster_occurrence" en int
-    clustered_data['Cluster_occurrence'] = clustered_data['Cluster_occurrence'].astype(int)
+    # Convertir la colonne "Poids" en int
+    clustered_data['Poids'] = clustered_data['Poids'].astype(int)
 
     # Tri du DataFrame par la colonne "Mot_nettoye" en ordre croissant
     clustered_data = clustered_data.sort_values(by='Mot_nettoye')
