@@ -43,7 +43,7 @@ def clean_with_cluster(input_csv_path, output_csv_path):
     # Clustering avec K-Means
     kmeans = KMeans(n_clusters=3)  # Spécifiez le nombre de clusters souhaité
     data['Cluster'] = kmeans.fit_predict(tfidf_matrix)
-
+    
     # Obtenez le nom du fichier d'origine sans extension
     base_filename = os.path.splitext(os.path.basename(input_csv_path))[0]
 
@@ -53,7 +53,7 @@ def clean_with_cluster(input_csv_path, output_csv_path):
     # Lire le nouveau fichier avec les clusters
     clustered_data = pd.read_csv(output_csv_path, sep=";", encoding='latin-1')
 
-    # Création d'une nouvelle colonne "Poids" pour stocker la somme des occurrences par mot
+    # Création d'une nouvelle colonne "Cluster_occurrence" pour stocker la somme des occurrences par mot
     clustered_data['Poids'] = clustered_data.groupby('Mot_nettoye')['Occurrence'].transform('sum')
 
     # Supprimer les colonnes "Mot", "Occurrence" et "Cluster"
@@ -61,9 +61,9 @@ def clean_with_cluster(input_csv_path, output_csv_path):
 
     # Remplacer les valeurs non finies (NaN et inf) par des zéros dans la colonne "Cluster_occurrence"
     clustered_data['Poids'].fillna(0, inplace=True)
-    clustered_data['Poids'] = clustered_data['Poids'].replace([np.inf, -np.inf], 0)
+    clustered_data['Poids'] = clustered_data['Poids'].replace([pd.np.inf, -pd.np.inf], 0)
 
-    # Convertir la colonne "Poids" en int
+    # Convertir la colonne "Cluster_occurrence" en int
     clustered_data['Poids'] = clustered_data['Poids'].astype(int)
 
     # Tri du DataFrame par la colonne "Mot_nettoye" en ordre croissant

@@ -19,7 +19,7 @@ def process_csv_file(file_path):
     
     # Sauvegarder le DataFrame dans le même fichier CSV (en écrasant l'original)
     df.to_csv(file_path, index=False, encoding='latin-1', sep=';')
-
+    
 def process_csv_directory(directory_path):
     for root, _, files in os.walk(directory_path):
         for file in files:
