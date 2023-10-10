@@ -36,7 +36,7 @@ def clean_with_cluster(input_csv_path, output_csv_path):
     # Clustering avec K-Means
     kmeans = KMeans(n_clusters=3)  # Spécifiez le nombre de clusters souhaité
     data['Cluster'] = kmeans.fit_predict(tfidf_matrix)
-
+    
     # Obtenez le nom du fichier d'origine sans extension
     base_filename = os.path.splitext(os.path.basename(input_csv_path))[0]
 

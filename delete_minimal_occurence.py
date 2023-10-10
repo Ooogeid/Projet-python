@@ -10,16 +10,16 @@ def process_csv_file(file_path):
     df = pd.read_csv(file_path, encoding='latin-1', sep=';')
 
     # Filtrer les lignes avec moins de 10 occurrences
-    df = df[df['Cluster_occurrence'] >= 10]
+    df = df[df['Poids'] >= 10]
 
     df = df[df['Mot_nettoye'].str.match(regex)]
     
     # Trier le DataFrame par ordre décroissant d'occurrence 
-    df = df.sort_values(by='Cluster_occurrence', ascending=False)
+    df = df.sort_values(by='Poids', ascending=False)
     
     # Sauvegarder le DataFrame dans le même fichier CSV (en écrasant l'original)
     df.to_csv(file_path, index=False, encoding='latin-1', sep=';')
-
+    
 def process_csv_directory(directory_path):
     for root, _, files in os.walk(directory_path):
         for file in files:
