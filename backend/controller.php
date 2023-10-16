@@ -2,8 +2,7 @@
 
 require 'service.php';
 
-if (isset($_POST['keyword'])) {
-    $keyword = $_POST['keyword']; // Récupérez le mot-clé depuis le front-end
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {   
 
     $dsn = 'mysql:host=localhost;dbname=projet_sae';
     $username = 'root';
@@ -14,7 +13,16 @@ if (isset($_POST['keyword'])) {
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $service = new SeriesService($pdo);
-        $result = $service->findSeries($keyword);
+        $jsonData = file_get_contents("php://input");
+        $data = json_decode($jsonData, true);
+
+        if (isset($data['credentials'])) {
+            $credentials = $data['credentials'];
+            $result = $service->findSeries($credentials);
+        }
+        else{
+            $result = "Pas de credentials";
+        }
 
         // Vous pouvez maintenant renvoyer $result en tant que réponse JSON, par exemple
         header('Content-Type: application/json');
