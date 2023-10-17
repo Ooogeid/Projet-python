@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         else{
             $result = "Pas de credentials";
         }
-
+        
         // Vous pouvez maintenant renvoyer $result en tant que réponse JSON, par exemple
         header('Content-Type: application/json');
         echo json_encode($result);
