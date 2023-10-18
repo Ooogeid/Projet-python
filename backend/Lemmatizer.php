@@ -26,7 +26,7 @@ class Lemmatizer {
    */
   public static function getLemma($input = '') {
     $alpha = $input[0];
-    $path = __DIR__ . '/data/lemmas_' . $alpha . '.php';
+    $path = __DIR__ . '/data_lemma/lemmas_' . $alpha . '.php';
     if (file_exists($path)) {
       require $path;
     }
@@ -49,7 +49,7 @@ class Lemmatizer {
    */
   public static function getWordsFromLemma($input = '') {
     $alpha = $input[0];
-    $path = __DIR__ . '/data/roots_' . $alpha . '.php';
+    $path = __DIR__ . '/data_lemma/roots_' . $alpha . '.php';
     if (file_exists($path)) {
       require $path;
     }
