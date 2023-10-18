@@ -3,31 +3,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputElement = document.getElementById('credentials');
     const resultDiv = document.getElementById('result');
 
-    searchButton.addEventListener('click', function() {
+    // Ajoutez un gestionnaire d'événements pour la soumission du formulaire
+    searchButton.addEventListener('submit', function(event) {
+        performSearch(event);
+    });
+
+    searchButton.addEventListener('click', function(event) {
+        performSearch(event);
+    });
+
+    function performSearch(event) {
+        event.preventDefault();
         const credentials = inputElement.value;
-        const regex = /^[a-zA-Z0-9\s]+$/; // Autorise les lettres, chiffres et espaces
-
         if (credentials) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '../backend/controller.php', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-            
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        const response = JSON.parse(xhr.responseText);
-                        displayResults(response);
-                    }
-                };
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '../backend/controller.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
 
-                const data = { credentials: credentials }; // Créez un objet JSON
-                xhr.send(JSON.stringify(data)); // Envoyez l'objet JSON
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    displayResults(response);
+                }
+            };
 
+            const data = { credentials: credentials }; // Créez un objet JSON
+            xhr.send(JSON.stringify(data)); // Envoyez l'objet JSON
         } else {
             resultDiv.innerHTML = 'Veuillez entrer un mot-clé.';
         }
-        
-    });
-    
+    }
 
     function displayResults(results) {
         let html = '<h2>Résultats :</h2>';

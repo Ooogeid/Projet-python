@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <html>
+    <link rel="stylesheet" type="text/css" href="styles.css">
 <head>
     <title>Recherche de séries par mot-clé</title>
 </head>
 <body>
-    <h1>Recherche de séries par mot-clé</h1>
-    <label>Mot-clé : </label>
-    <input type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
-    <button id="searchButton">Rechercher</button>
-    <div id="result"></div>
-
+    <div class="ctr-main">
+        <h1>Recherche de séries par mot-clé</h1>
+        <form class="searchForm">
+            <label>Mot-clé : </label>
+            <input type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
+            <button type="submit" id="searchButton">Rechercher</button>
+        </form>
+        <div id="result"></div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
