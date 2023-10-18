@@ -18,73 +18,87 @@ class SeriesService {
     public function findSeries($keywords) {
 
         $series = [];
+        $addedSeries = [];
+
+        // On sépare chaque mot reçu par un espace
         $keywordsArray = explode(' ', $keywords);
 
         // On converti tous les mots en minuscules
-        $keywordsArray = array_map('strtolower', $keywordsArray);
-        $keywordsArray = array_map(function($word) {
+        $keywordsArrayMinuscule = array_map('strtolower', $keywordsArray);
+
+        //On récupère les mots sans caractères spéciaux (sauf les chiffres)
+        $keywordsArrayMinuscule = array_map(function($word) {
             return preg_replace('/[^a-z0-9]/', '', $word);
-        }, $keywordsArray);
-
-        // Lemmatisation des mots-clés
-        $keywords = array_map(['self', 'lemmatize'], $keywordsArray);
-
-        // Recherche de séries dont le titre correspond au mot-clé
-        $titleMatches = $this->searchSeriesByTitle($keywordsArray);
+        }, $keywordsArrayMinuscule); 
         
+        // Lemmatisation des mots-clés
+        $keywordsLemma = array_map(['self', 'lemmatize'], $keywordsArrayMinuscule);
+
+        // Recherche de séries dont le titre correspond au mot-clé (on ne lemmatise pas celui-ci)
+        $titleMatches = $this->searchSeriesByTitle($keywordsArrayMinuscule);
+
         // Si des correspondances de titre sont trouvées, les ajouter en premier
-        if (!empty($titleMatches)) {
-            $series = $this->mergeResults($series, $titleMatches);
+        foreach ($titleMatches as $titleMatch) {
+            $seriesTitle = $titleMatch['titre'];
+            if (!isset($addedSeries[$seriesTitle])) {
+                $series[] = $titleMatch;
+                $addedSeries[$seriesTitle] = true;
+            }
         }
         
-        $keywordsToSearch = array_diff($keywordsArray, array_column($titleMatches, 'titre'));
+        $keywordsToSearch = array_diff($keywordsLemma, array_column($titleMatches, 'titre'));
 
-        foreach ($keywordsToSearch as $keyword) {
-
+        // Pour chaque mot-clé restant, on recherche les séries correspondantes
+        foreach ($keywordsArrayMinuscule as $keyword) {
+            // On détecte la langue du mot-clé
             $language = DetectLanguage::simpleDetect($keyword);
 
-            // Choisissez la table appropriée en fonction de la langue
+            // Langue française ou anglaise
             $table = ($language == 'fr') ? 'vf' : 'vo';
 
             $query = "
-                SELECT s.titre, SUM(av.poids) AS total_poids
+                SELECT s.titre, av.poids AS poids
                 FROM serie s
                 JOIN apparition_$table av ON s.id_serie = av.id_serie
                 JOIN mots_$table mv ON av.id_mot_$table = mv.id_mot_$table
                 WHERE mv.Libelle = :keyword
-                GROUP BY s.titre
-                ORDER BY total_poids DESC
+                ORDER BY poids DESC
                 LIMIT 20";
     
-            
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':keyword', $keyword, PDO::PARAM_STR);
             $stmt->execute();
     
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $series = $this->mergeResults($series, $result);
+            foreach ($result as $seriesResult) {
+                $seriesTitle = $seriesResult['titre'];
+                if (!isset($addedSeries[$seriesTitle])) {
+                    $series[] = $seriesResult;
+                    $addedSeries[$seriesTitle] = true;
+                }
+            }
         }
-    
+
         // On trie les séries par le poids total décroissant
         usort($series, function ($a, $b) {
-            return $b['total_poids'] - $a['total_poids'];
+            return $b['poids'] - $a['poids'];
         });
-    
-        // On limite les résultats à 20 séries
+
+        // On ne garde que les 20 premiers résultats
         $series = array_slice($series, 0, 20);
-    
+        
         return $series;
     }
     
+    // Recherche de séries dont le titre correspond au mot-clé
     private function searchSeriesByTitle($keywords) {
         // Recherche de séries dont le titre correspond au mot-clé
         $query = "
-            SELECT s.titre, SUM(av.poids) AS total_poids
+            SELECT s.titre, av.poids AS poids
             FROM serie s
             JOIN apparition_vo av ON s.id_serie = av.id_serie
             WHERE s.titre LIKE :keyword
-            GROUP BY s.titre
-            ORDER BY total_poids DESC
+            ORDER BY poids DESC
             LIMIT 20";
     
         $matches = [];
@@ -94,7 +108,7 @@ class SeriesService {
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':keyword', $searchKeyword, PDO::PARAM_STR);
             $stmt->execute();
-    
+            
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
             if (!empty($result)) {
@@ -103,20 +117,6 @@ class SeriesService {
         }
     
         return $matches;
-    }
-
-    private function mergeResults($series, $newResults) {
-        // On fusionne les résultats en maintenant le total de poids par série
-        foreach ($newResults as $result) {
-            $title = $result['titre'];
-            $totalWeight = $result['total_poids'];
-            if (isset($series[$title])) {
-                $series[$title]['total_poids'] += $totalWeight;
-            } else {
-                $series[$title] = $result;
-            }
-        }
-        return $series;
     }
     
     private static function lemmatize($word) {

@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function displayResults(results) {
-        let html = '<h2>Résultats :</h2>';
+        let html = '';
         if (results.length > 0) {
             html += '<ul>';
             results.forEach(function(result) {
