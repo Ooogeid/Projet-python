@@ -2,6 +2,7 @@
 <meta charset="utf-8">
 <html>
     <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <head>
     <title>Recherche de séries par mot-clé</title>
 </head>
@@ -13,6 +14,9 @@
             <input type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
             <button type="submit" id="searchButton">Rechercher</button>
         </form>
+        <div class="loading-spinner" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
         <div id="result"></div>
     </div>
     <script src="script.js"></script>

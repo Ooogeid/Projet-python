@@ -16,16 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $result = "Pas de credentials";
         }
-
-        // Vous pouvez maintenant renvoyer $result en tant que réponse JSON, par exemple
         header('Content-Type: application/json');
         echo json_encode($result);
     } catch (PDOException $e) {
-        // Gérer les erreurs de connexion à la base de données
         echo 'Erreur de connexion à la base de données : ' . $e->getMessage();
     }
 } else {
-    http_response_code(405); // Méthode non autorisée
+    http_response_code(405); 
     echo 'Méthode non autorisée.';
 }
 ?>

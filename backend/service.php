@@ -55,7 +55,7 @@ class SeriesService {
 
             // Langue française ou anglaise
             $table = ($language == 'fr') ? 'vf' : 'vo';
-
+            
             $query = "
                 SELECT s.titre, av.poids AS poids
                 FROM serie s

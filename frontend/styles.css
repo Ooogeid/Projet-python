@@ -82,4 +82,13 @@ li {
 }
 
 
+.loading-spinner {
+    text-align: center;
+    margin-top: 40px;
+    display: none; /* Cachez le spinner par défaut */
+}
 
+.loading-spinner i {
+    font-size: 48px; /* Taille de l'icône du spinner */
+    color: #ffffff; /* Couleur du spinner (par exemple, bleue) */
+}
