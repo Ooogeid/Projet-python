@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $service = new SeriesService($pdo);
         $jsonData = file_get_contents("php://input");
         $data = json_decode($jsonData, true);
-
+        
         if (isset($data['credentials'])) {
             $credentials = $data['credentials'];
             $result = $service->findSeries($credentials);

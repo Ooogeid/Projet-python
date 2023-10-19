@@ -15,47 +15,101 @@ class SeriesService {
         $this->db = $db;
     }
 
+    // Première fonction de l'api permettant de traiter les mots-clés reçus en les séparant, 
+    // en les filtrant, en les convertissant en minuscules, en les lemmatisant 
+    // puis en recherchant d'abord si il y a des correspondances de titre 
+    // (afin de ressortir en premier les correspondances directs de titres)
+    private function preprocessKeywords($keywords) {
+
+        // On sépare chaque mot reçu par un espace
+        $keywordsArray = explode(' ', $keywords);
+    
+        // Filtrer les mots-clés pour exclure les éléments vides
+        $keywordsArray = array_filter($keywordsArray, 'strlen');
+    
+        // Rejoindre les mots-clés pour former une chaîne
+        $cleanedKeywords = implode(' ', $keywordsArray);
+    
+        // On convertit tous les mots en minuscules
+        $keywordsArrayMinuscule = array_map('strtolower', $keywordsArray);
+    
+        // On récupère les mots sans caractères spéciaux (sauf les chiffres)
+        $keywordsArrayMinuscule = array_map(function($word) {
+            return preg_replace('/[^a-z0-9]/', '', $word);
+        }, $keywordsArrayMinuscule);
+    
+        // Lemmatisation des mots-clés
+        $keywordsLemma = array_map([$this, 'lemmatize'], $keywordsArrayMinuscule);
+    
+        // Recherche de séries dont le titre correspond au mot-clé (on ne lemmatise pas celui-ci)
+        $titleMatches = $this->searchSeriesByTitle($keywordsArrayMinuscule);
+    
+        return [
+            'cleanedKeywords' => $cleanedKeywords,
+            'keywordsArrayMinuscule' => $keywordsArrayMinuscule,
+            'keywordsLemma' => $keywordsLemma,
+            'titleMatches' => $titleMatches
+        ];
+    }
+    
+
+    // Fonction de comparaison des séries, utilisée pour le tri des séries
+    private function compareSeries($a, $b, $seriesWeights, $commonKeywordsCount) {
+        $countA = $commonKeywordsCount[$a['titre']];
+        $countB = $commonKeywordsCount[$b['titre']];
+        
+        if ($countA === $countB) {
+            $sumA = array_sum($seriesWeights[$a['titre']]);
+            $sumB = array_sum($seriesWeights[$b['titre']]);
+    
+            if ($sumA === $sumB) {
+                return 0;
+            }
+    
+            return ($sumA > $sumB) ? -1 : 1;
+        }
+    
+        return ($countA > $countB) ? -1 : 1;
+    }
+
+    // Fonction majeur de l'api qui va ressortir les séries avec le plus grand poids
+    // mais aussi celles qui ont le plus de mots clés commun avec la recherche
     public function findSeries($keywords) {
 
         $series = [];
         $addedSeries = [];
+        $x = $this->preprocessKeywords($keywords); // appel de la première fonction pour récupérer les données propre
 
-        // On sépare chaque mot reçu par un espace
-        $keywordsArray = explode(' ', $keywords);
-
-        // On converti tous les mots en minuscules
-        $keywordsArrayMinuscule = array_map('strtolower', $keywordsArray);
-
-        //On récupère les mots sans caractères spéciaux (sauf les chiffres)
-        $keywordsArrayMinuscule = array_map(function($word) {
-            return preg_replace('/[^a-z0-9]/', '', $word);
-        }, $keywordsArrayMinuscule); 
-        
-        // Lemmatisation des mots-clés
-        $keywordsLemma = array_map(['self', 'lemmatize'], $keywordsArrayMinuscule);
-
-        // Recherche de séries dont le titre correspond au mot-clé (on ne lemmatise pas celui-ci)
-        $titleMatches = $this->searchSeriesByTitle($keywordsArrayMinuscule);
-
+        // Créez un tableau pour stocker les mots-clés de chaque série
+        $seriesKeywords = [];
+        // Créez un tableau pour stocker les poids des mots-clés de chaque série
+        $seriesWeights = [];
+    
         // Si des correspondances de titre sont trouvées, les ajouter en premier
-        foreach ($titleMatches as $titleMatch) {
+        foreach ($x['titleMatches'] as $titleMatch) {
             $seriesTitle = $titleMatch['titre'];
             if (!isset($addedSeries[$seriesTitle])) {
                 $series[] = $titleMatch;
                 $addedSeries[$seriesTitle] = true;
+    
+                // Ajoutez les mots-clés de cette série au tableau des mots-clés
+                $seriesKeywords[$seriesTitle] = [$x['keywordsArrayMinuscule']];
+                
+                // Ajoutez les poids des mots-clés de cette série au tableau des poids
+                $seriesWeights[$seriesTitle] = [$titleMatch['poids']];
             }
         }
         
-        $keywordsToSearch = array_diff($keywordsLemma, array_column($titleMatches, 'titre'));
-
+        $keywordsToSearch = array_diff($x['keywordsLemma'], array_column($x['titleMatches'], 'titre'));
+    
         // Pour chaque mot-clé restant, on recherche les séries correspondantes
-        foreach ($keywordsArrayMinuscule as $keyword) {
+        foreach ($x['keywordsArrayMinuscule'] as $keyword) {
             // On détecte la langue du mot-clé
             $language = DetectLanguage::simpleDetect($keyword);
-
+    
             // Langue française ou anglaise
             $table = ($language == 'fr') ? 'vf' : 'vo';
-            
+
             $query = "
                 SELECT s.titre, av.poids AS poids
                 FROM serie s
@@ -75,21 +129,53 @@ class SeriesService {
                 if (!isset($addedSeries[$seriesTitle])) {
                     $series[] = $seriesResult;
                     $addedSeries[$seriesTitle] = true;
+            
+                    // Ajoutez les mots-clés de cette série au tableau des mots-clés
+                    $seriesKeywords[$seriesTitle] = [$keyword];
+                    // Ajoutez les poids des mots-clés de cette série sous forme de tableau
+                    $seriesWeights[$seriesTitle] = [$seriesResult['poids']];
+                    
+
+                } else {
+                    // Si la série existe déjà, ajoutez le poids du mot-clé à son tableau de poids
+                    $seriesWeights[$seriesTitle] = [$seriesResult['poids']];
                 }
             }
         }
+    
+        // Créez un tableau pour stocker le nombre de mots-clés en commun avec la recherche pour chaque série
+        $commonKeywordsCount = [];
+    
+        // Pour chaque série, calculez le nombre de mots-clés en commun avec la recherche
+        foreach ($series as $seriesResult) {
+            $seriesTitle = $seriesResult['titre'];
+            $commonKeywordsCount[$seriesTitle] = count(array_intersect($seriesKeywords[$seriesTitle], $x['keywordsArrayMinuscule']));
+        }
 
-        // On trie les séries par le poids total décroissant
-        usort($series, function ($a, $b) {
-            return $b['poids'] - $a['poids'];
+        // Triez les séries par le nombre de mots-clés en commun avec la recherche
+        // puis par la somme du poids des mots-clés dans chaque série
+        uasort($series, function ($a, $b) use ($seriesWeights, $commonKeywordsCount) {
+            return $this->compareSeries($a, $b, $seriesWeights, $commonKeywordsCount);
         });
 
+        // Obtenir les clés triées
+        $sortedSeriesKeys = array_keys($series);
+
+        // Créer un tableau pour stocker les séries triées
+        $sortedSeries = [];
+
+        // Remplir le tableau des séries triées avec les données complètes
+        foreach ($sortedSeriesKeys as $key) {
+            $sortedSeries[] = $series[$key];
+        }
+
         // On ne garde que les 20 premiers résultats
-        $series = array_slice($series, 0, 20);
-        
-        return $series;
+        $top20Series = array_slice($sortedSeries, 0, 20);
+
+        // Retournez le tableau des 20 premières séries triées
+        return $top20Series;
     }
-    
+
     // Recherche de séries dont le titre correspond au mot-clé
     private function searchSeriesByTitle($keywords) {
         // Recherche de séries dont le titre correspond au mot-clé
@@ -119,9 +205,15 @@ class SeriesService {
         return $matches;
     }
     
+    // Fonction pour lemmatiser les mots grâce à une librairie externe (que en anglais pour l'instant)
     private static function lemmatize($word) {
-        $lemmatizedWord = Lemmatizer::getLemma($word);
-        return $lemmatizedWord;
+        if (empty($word)) {
+            return $word; 
+        }
+        else{
+            $lemmatizedWord = Lemmatizer::getLemma($word);
+            return $lemmatizedWord;    
+        }
     }
     
 }
