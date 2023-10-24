@@ -3,10 +3,6 @@
 use writecrow\Lemmatizer\Lemmatizer;
 require 'Lemmatizer.php';
 
-require_once("../detectlanguage-php-master/lib/detectlanguage.php");
-use \DetectLanguage\DetectLanguage;
-DetectLanguage::setApiKey("9e448e369dc91f43bc8a6e737ed2b70d");
-
 class SeriesService {
 
     private $db;
@@ -74,11 +70,11 @@ class SeriesService {
 
     // Fonction majeur de l'api qui va ressortir les séries avec le plus grand poids
     // mais aussi celles qui ont le plus de mots clés commun avec la recherche
-    public function findSeries($keywords) {
-
+    public function findSeries($credentials) {
+        
         $series = [];
         $addedSeries = [];
-        $x = $this->preprocessKeywords($keywords); // appel de la première fonction pour récupérer les données propre
+        $processedKeywords = $this->preprocessKeywords($credentials['keyword']); // appel de la première fonction pour récupérer les données propre
 
         // Créez un tableau pour stocker les mots-clés de chaque série
         $seriesKeywords = [];
@@ -86,30 +82,31 @@ class SeriesService {
         $seriesWeights = [];
     
         // Si des correspondances de titre sont trouvées, les ajouter en premier
-        foreach ($x['titleMatches'] as $titleMatch) {
+        foreach ($processedKeywords['titleMatches'] as $titleMatch) {
             $seriesTitle = $titleMatch['titre'];
             if (!isset($addedSeries[$seriesTitle])) {
                 $series[] = $titleMatch;
                 $addedSeries[$seriesTitle] = true;
     
                 // Ajoutez les mots-clés de cette série au tableau des mots-clés
-                $seriesKeywords[$seriesTitle] = [$x['keywordsArrayMinuscule']];
-                
+                $seriesKeywords[$seriesTitle] = $processedKeywords['keywordsArrayMinuscule'];
+    
                 // Ajoutez les poids des mots-clés de cette série au tableau des poids
                 $seriesWeights[$seriesTitle] = [$titleMatch['poids']];
             }
         }
         
-        $keywordsToSearch = array_diff($x['keywordsLemma'], array_column($x['titleMatches'], 'titre'));
+        $keywordsToSearch = array_diff($processedKeywords['keywordsLemma'], array_column($processedKeywords['titleMatches'], 'titre'));
     
         // Pour chaque mot-clé restant, on recherche les séries correspondantes
-        foreach ($x['keywordsArrayMinuscule'] as $keyword) {
+        foreach ($processedKeywords['keywordsArrayMinuscule'] as $keyword) {
+
             // On détecte la langue du mot-clé
-            $language = DetectLanguage::simpleDetect($keyword);
-    
+            $language = $credentials['language'];
+
             // Langue française ou anglaise
             $table = ($language == 'fr') ? 'vf' : 'vo';
-
+            
             $query = "
                 SELECT s.titre, av.poids AS poids
                 FROM serie s
@@ -149,7 +146,7 @@ class SeriesService {
         // Pour chaque série, calculez le nombre de mots-clés en commun avec la recherche
         foreach ($series as $seriesResult) {
             $seriesTitle = $seriesResult['titre'];
-            $commonKeywordsCount[$seriesTitle] = count(array_intersect($seriesKeywords[$seriesTitle], $x['keywordsArrayMinuscule']));
+            $commonKeywordsCount[$seriesTitle] = count(array_intersect($seriesKeywords[$seriesTitle], $processedKeywords['keywordsArrayMinuscule']));
         }
 
         // Triez les séries par le nombre de mots-clés en commun avec la recherche

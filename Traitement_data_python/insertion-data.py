@@ -1,3 +1,4 @@
+from gettext import translation
 import os
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -41,7 +42,7 @@ for file_name in os.listdir(input_directory):
                 serie_id = result.scalar()
                 print(serie_id)
             except Exception as e:
-                transaction.rollback()
+                translation.rollback()
                 raise e
             finally:
                 connection.close()
@@ -81,7 +82,7 @@ for file_name in os.listdir(input_directory):
             id_mot_vf = next(item for item in mots_vf_ids_df if item[1] == libelle_mot)[0]
 
             # Ajouter les données à la DataFrame apparition_vf
-            apparition_vf_df = apparition_vf_df.append({'id_serie': serie_id, 'id_mot_vf': id_mot_vf, 'poids': poids}, ignore_index=True)
+            apparition_vf_df = apparition_vf_df.append({'id_serie': serie_id, 'id_mot_vf': id_mot_vf, 'poids': poids}, ignore_index=True) # type: ignore
 
         # Insérer les données dans la table apparition_vf
         connection = engine.connect()

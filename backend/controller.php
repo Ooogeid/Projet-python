@@ -8,10 +8,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo = Database::getInstance();
         $service = new SeriesService($pdo);
         $jsonData = file_get_contents("php://input");
-        $data = json_decode($jsonData, true);
+        $credentials = json_decode($jsonData, true);
         
-        if (isset($data['credentials'])) {
-            $credentials = $data['credentials'];
+        if (isset($credentials['keyword'])) {
             $result = $service->findSeries($credentials);
         } else {
             $result = "Pas de credentials";

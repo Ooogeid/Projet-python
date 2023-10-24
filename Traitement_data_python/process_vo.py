@@ -54,7 +54,7 @@ def clean_with_cluster(input_csv_path, output_csv_path):
 
     # Remplacer les valeurs non finies (NaN et inf) par des zéros dans la colonne "Cluster_occurrence"
     clustered_data['Poids'].fillna(0, inplace=True)
-    clustered_data['Poids'] = clustered_data['Poids'].replace([pd.np.inf, -pd.np.inf], 0)
+    clustered_data['Poids'] = clustered_data['Poids'].replace([pd.np.inf, -pd.np.inf], 0) # type: ignore
 
     # Convertir la colonne "Cluster_occurrence" en int
     clustered_data['Poids'] = clustered_data['Poids'].astype(int)

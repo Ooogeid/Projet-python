@@ -12,7 +12,7 @@ def process_csv_file(file_path):
     # Filtrer les lignes avec moins de 10 occurrences
     df = df[df['Poids'] >= 10]
 
-    df = df[df['Mot_nettoye'].str.match(regex)]
+    df = df[df['Mot_nettoye'].str.match(regex)] # type: ignore
     
     # Trier le DataFrame par ordre décroissant d'occurrence 
     df = df.sort_values(by='Poids', ascending=False)
