@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
         performSearch(event);
     });
 
+    inputElement.addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Empêche le comportement par défaut du formulaire
+            performSearch(event);
+        }
+    });
+
     languageToggle.addEventListener('change', function() {
         if (languageToggle.checked) {
             saveLanguageSelection('en');
@@ -78,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayResults(results) {
         let html = '';
         if (results.length > 0) {
-            html += '<ul>';
+            html += '<ul class="ul-result">';
             results.forEach(function(result) {
                 html += '<li>' + result.titre + '</li>';
             });

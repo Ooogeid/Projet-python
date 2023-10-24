@@ -7,21 +7,30 @@
     <title>Recherche de séries par mot-clé</title>
 </head>
 <body>
+    <header>
+        <nav class="navbar">
+            <ul>
+                <li><img src="img/netflix.png" width="100px"></li>
+                <li><a href="#">Accueil</a></li>
+                <li><a href="#">Catégories</a></li>
+                <li><a href="#">Ma liste</a></li>
+                <li class="search-bar">
+                    <div class="language-selection">
+                        <span class="language-span" id="language-span">Français</span>
+                        <label class="switch">
+                            <input type="checkbox" id="languageToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <input class="input" type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
+                    <button type="submit" id="searchButton">Rechercher</button>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
     <div class="ctr-main">
-        <h1>Recherche de séries par mot-clé</h1>
-        <p>Sélectionner la langue de recherche</p>
-        <div class="language-selection">
-            <label class="switch">
-                <input type="checkbox" id="languageToggle">
-                <span class="slider round"></span>
-            </label>
-            <span class="language-span" id="language-span">Français</span>
-        </div>
-        <form class="searchForm">
-            <label>Mot-clé : </label>
-            <input type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
-            <button type="submit" id="searchButton">Rechercher</button>
-        </form>
+        <h1>Essayer une recherche</h1>
         <div class="loading-spinner" style="display: none;">
             <i class="fas fa-spinner fa-spin"></i>
         </div>

@@ -11,9 +11,68 @@ body {
     background-color: #141414;
     color: #fff;
     text-align: center;
-    padding: 20px;
 }
 
+
+/* Style du header */
+header {
+    background-color: #000; /* Couleur de fond */
+    color: #fff; /* Couleur du texte */
+}
+
+/* Style de la barre de navigation */
+.navbar {
+    width: 100%; /* Prend toute la largeur du header */
+}
+
+/* Style des éléments de la liste */
+.navbar ul {
+    list-style: none; /* Supprime les puces de liste */
+    display: flex; /* Affichage en ligne */
+}
+
+/* Style des éléments de la liste */
+/* Style des éléments de la liste */
+.navbar li {
+    display: flex; /* Permet l'alignement vertical du texte */
+    align-items: center; /* Centre le texte verticalement */
+    margin-left: 20px;
+    margin-right: 20px; /* Marge à droite pour espacer les éléments */
+}
+
+
+/* Style des liens (texte) */
+.navbar a {
+    text-decoration: none; /* Supprime la soulignement des liens */
+    color: #fff; /* Couleur du texte des liens */
+    font-size: 18px; /* Taille du texte */
+    text-align: center; /* Centre le texte horizontalement */
+}
+
+/* Change la couleur du lien lorsqu'il est survolé */
+.navbar a:hover {
+    color: red; /* Couleur du texte au survol */
+}
+
+/* Style pour la barre de recherche et le bouton de recherche */
+.navbar .search-bar {
+    margin-left: auto; /* on place la recherche tout a droite */
+}
+
+/* Style pour le bouton de recherche */
+.navbar .search-bar button {
+    background-color: #e50914;
+    color: #fff;
+    font-size: 18px;
+    padding: 10px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px; /* Marge à gauche pour espacer du champ de recherche */
+}
+
+
+/* style du conteneur principal */
 .ctr-main {
     padding: 20px;
 }
@@ -33,46 +92,25 @@ p{
     display: flex; 
     align-items: center; 
     justify-content: center;
-    margin-bottom: 10px;
+    grid-gap: 10px;
+    margin-right: 20px;
 }
 
-.language-span{
-    margin-left: 10px;
-}
 
-/* Formulaire de recherche */
-label {
-    display: flex;
-    font-size: 18px;
-}
-
-input[type="text"] {
-    width: 100%;
+ .input {
     padding: 10px;
     font-size: 16px;
     border: none;
     border-radius: 5px;
     margin-bottom: 20px;
     margin-top: 20px;
-}
+} 
 
-button {
-    background-color: #e50914;
-    color: #fff;
-    font-size: 18px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #b50b0e;
-}
 
 /* Résultats de la recherche */
 #result {
-    margin-top: 20px;
+    margin-top: 40px;
+    padding: 20px;
     font-size: 18px;
     color: #d7f4ff; /* Couleur du message d'erreur */
 }
@@ -84,17 +122,16 @@ h2 {
     color: #21dae7; /* Couleur du titre */
 }
 
-ul {
+.ul-result {
     list-style: none;
     padding: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr); /* Quatre colonnes par ligne */
-    grid-gap: 20px; /* Espacement entre les éléments */
+    grid-gap: 70px; /* Espacement entre les éléments */
 }
 
 li {
     font-size: 18px;
-    margin-bottom: 10px;
 }
 
 
