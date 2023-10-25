@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="login.css"> <!-- Assurez-vous d'ajouter le bon chemin vers votre fichier CSS -->
+    <title>Connexion</title>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="login-title">Connectez-vous</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur : </label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe :</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <input type="hidden" id="isLogin" name="isLogin" value="1">
+            <button type="submit" class="login-button" id="connectButton">Se connecter</button>
+        </form>
+        <div class="login-links">
+            <a href="mot_de_passe_oublie.html">Mot de passe oublié</a>
+            <span>|</span>
+            <a href="#" id="inscriptionLink">Inscription</a>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

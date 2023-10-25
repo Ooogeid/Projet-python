@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <html>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <head>
-    <title>Recherche de séries par mot-clé</title>
+    <title>RétroFlix</title>
 </head>
 <body>
+    
     <header>
         <nav class="navbar">
             <ul>
-                <li><img src="img/netflix.png" width="100px"></li>
+                <li><img src="../img/netflix.png" width="100px"></li>
                 <li><a href="#">Accueil</a></li>
                 <li><a href="#">Catégories</a></li>
                 <li><a href="#">Ma liste</a></li>
-                <li class="search-bar">
+                <li class="right-side">
+                    <div class="bar">
+                        <div class="input-container">
+                            <img src="../img/loupe.png" alt="Loupe" class="search-icon" id="searchIcon">
+                            <input class="input" type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
+                        </div>
+                    </div>                    
                     <div class="language-selection">
                         <span class="language-span" id="language-span">Français</span>
                         <label class="switch">
@@ -22,20 +29,23 @@
                             <span class="slider round"></span>
                         </label>
                     </div>
-                    <input class="input" type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
-                    <button type="submit" id="searchButton">Rechercher</button>
+                    <div class="user-info">
+                        <img width="50px" src="../img/netflix.png">
+                        <span id="usernameDisplay" class="username"></span>
+                    </div>
                 </li>
             </ul>
         </nav>
     </header>
 
     <div class="ctr-main">
-        <h1>Essayer une recherche</h1>
+        <h1>Bienvenue sur RétroFlix, toutes vos séries des années 2000 !</h1>
         <div class="loading-spinner" style="display: none;">
             <i class="fas fa-spinner fa-spin"></i>
         </div>
         <div id="result"></div>
     </div>
-    <script src="script.js"></script>
+    <script src="home.js"></script>
+
 </body>
 </html>

@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    // Récupérez le nom d'utilisateur à partir de l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const loggedInUsername = urlParams.get('username');
+
+    // Mettez à jour le contenu de l'élément HTML avec le nom d'utilisateur
+    const usernameDisplay = document.getElementById('usernameDisplay');
+    usernameDisplay.textContent = loggedInUsername;
+
     const searchButton = document.getElementById('searchButton');
     const inputElement = document.getElementById('credentials');
     const resultDiv = document.getElementById('result');
@@ -6,8 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let xhr = null;
 
-    // Ajoutez un gestionnaire d'événements pour la soumission du formulaire
-    searchButton.addEventListener('click', function(event) {
+    searchIcon.addEventListener('click', function(event) {
         performSearch(event);
     });
 
@@ -21,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     languageToggle.addEventListener('change', function() {
         if (languageToggle.checked) {
             saveLanguageSelection('en');
+            console.log("hello")
         } else {
             saveLanguageSelection('fr'); // Par défaut la recherche est en français
         }
@@ -56,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
             spinner.style.display = 'block';
 
             xhr = new XMLHttpRequest();
-            xhr.open('POST', '../backend/controller.php', true);
+            xhr.open('POST', '../../backend/controller.php', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
 
             xhr.onreadystatechange = function() {
@@ -70,7 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             const selectedLanguage = localStorage.getItem("selectedLanguage");
-            console.log(selectedLanguage);
 
             const credentials = {
                 keyword: keyword,
