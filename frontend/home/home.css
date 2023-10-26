@@ -42,8 +42,8 @@ header {
     height: 70px;
     display: flex; /* Permet l'alignement vertical du texte */
     align-items: center; /* Centre le texte verticalement */
-    margin-left: 20px;
-    margin-right: 20px; /* Marge à droite pour espacer les éléments */
+    margin-left: 25px;
+    margin-right: 25px; /* Marge à droite pour espacer les éléments */
 }
 
 
@@ -67,7 +67,6 @@ header {
     margin-left: auto; 
     position: absolute; 
     right: 0; 
-    padding: 10px;
 }
 
 .bar{
@@ -113,15 +112,42 @@ header {
     color: #fff;
 }
 
-.user-info{
+.user-info {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 10px;
+    position: relative;
 }
 
-.user-info span{
-    margin-left: 10px;
+.user-info span {
+    margin-right: 10px;
+}
+
+.user-info:hover {
+    cursor: pointer; /* Ajoutez le curseur pointer au survol */
+}
+
+.user-info::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #fff;
+    transform: scaleX(0); /* Pour masquer initialement la ligne */
+    transform-origin: right;
+    transition: transform 0.3s ease; /* Animation de transition */
+}
+
+.user-info:hover::after {
+    transform: scaleX(1); /* Affiche la ligne au passage de la souris */
+}
+
+.user-info img {
+    width: 40px;
+    height: auto;
 }
 
 .language-span{
@@ -204,9 +230,11 @@ header {
 
 /* Style du fond */
 body {
+    width: 100%;
+    min-height: 100vh;
     font-family: 'Gotham Book', sans-serif;
     font-weight: 500;
-    background-color: #141414;
+    background: linear-gradient(to top, #003470, #141414);
     color: #fff;
     text-align: center;
 }

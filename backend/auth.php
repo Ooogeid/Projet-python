@@ -1,6 +1,7 @@
 <?php
 require_once('connexion.php'); // fichier pour avoir l'instance de connexion à la bdd
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -18,10 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $statement->execute();
 
         $row = $statement->fetch(PDO::FETCH_ASSOC);
-
+        
         if ($row) {
             $storedPassword = $row['password'];
             if (password_verify($password, $storedPassword)) {
+                session_start(); // Démarrez la session
+                $_SESSION['username'] = $username; // on stock le username en session 
                 $response = [
                     'success' => true,
                     'message' => 'Connecté avec succès',

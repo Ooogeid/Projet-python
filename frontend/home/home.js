@@ -1,12 +1,27 @@
+
+// Vérifier si une session est active
+const xhr = new XMLHttpRequest();
+xhr.open('GET', '../../backend/check_session.php', true);
+
+xhr.onload = function () {
+    if (xhr.status >= 200 && xhr.status < 300) {
+        const response = JSON.parse(xhr.responseText);
+        if (response.success && response.username) {
+            // Une session est active, l'utilisateur est connecté
+            document.getElementById('usernameDisplay').textContent = response.username;
+        } else {
+            // Pas de session active, redirigez vers la page de connexion
+            window.location.href = '../login/login.html';
+        }
+    } else {
+        // Gestion des erreurs ici
+        console.error('Erreur :', xhr.status, xhr.statusText);
+    }
+};
+
+xhr.send();
+
 document.addEventListener('DOMContentLoaded', function() {
-
-    // Récupérez le nom d'utilisateur à partir de l'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const loggedInUsername = urlParams.get('username');
-
-    // Mettez à jour le contenu de l'élément HTML avec le nom d'utilisateur
-    const usernameDisplay = document.getElementById('usernameDisplay');
-    usernameDisplay.textContent = loggedInUsername;
 
     const searchButton = document.getElementById('searchButton');
     const inputElement = document.getElementById('credentials');
@@ -34,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveLanguageSelection('fr'); // Par défaut la recherche est en français
         }
     });
+
 
     function saveLanguageSelection(language) { // On sauvegarde la sélection de la langue 
         localStorage.setItem('selectedLanguage', language);

@@ -34,12 +34,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         loginForm.reset(); // Effacez les champs
                         inscriptionLink.style.display = 'inline'; // Réaffiche le lien d'inscription
                         connectButton.textContent = 'S\'inscrire'; // Changez le texte du bouton en "S'inscrire"
-                        // Redirigez vers la page de connexion
                         window.location.href = 'login.html';
                     } else {
                         // Connexion réussie, redirigez vers la page d'accueil
-                        loggedInUsername = response.username;
-                        window.location.href = `../home/home.html?username=${loggedInUsername}`;
+                        window.location.href = '../home/home.html';
                     }
                 } else {
                     // Affichez un message d'erreur (vous pouvez personnaliser cela côté serveur)
