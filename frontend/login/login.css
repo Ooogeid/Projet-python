@@ -93,6 +93,13 @@ body {
     cursor: pointer;
 }
 
+.login-errorMessage{
+    display: block; 
+    color: red; 
+    font-size: 14px;
+    margin-top: 10px;
+}
+
 .login-button:hover {
     color: #003470;
 }

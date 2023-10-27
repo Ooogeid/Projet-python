@@ -50,6 +50,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    const logoutLink = document.getElementById('logoutLink'); // lien pour se déconnecter
+
+    logoutLink.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '../../backend/logout.php', true);
+
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                // Rediriger vers la page de connexion une fois déconnecté
+                window.location.href = '../login/login.html';
+            } else {
+                console.error('Erreur :', xhr.status, xhr.statusText);
+            }
+        };
+
+        xhr.send();
+    });
+
 
     function saveLanguageSelection(language) { // On sauvegarde la sélection de la langue 
         localStorage.setItem('selectedLanguage', language);

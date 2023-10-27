@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const username = usernameInput.value;
         const password = passwordInput.value;
         const isLogin = isLoginFormVisible ? 1 : 0; // 1 pour connexion, 0 pour inscription
+        const errorMessage = document.getElementById('errorMessage'); // Si les infos sont incorrects
 
         // Créez un objet FormData pour les données à envoyer
         const formData = new FormData();
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 } else {
                     // Affichez un message d'erreur (vous pouvez personnaliser cela côté serveur)
-                    message.textContent = response.message;
+                    errorMessage.textContent = response.message;
                 }
             } else {
                 // Gestion des erreurs ici
