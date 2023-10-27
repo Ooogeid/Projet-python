@@ -1,5 +1,5 @@
+import re
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 
 # Configuration de la connexion à la base de données MySQL
 db_username = 'root'
@@ -9,11 +9,7 @@ db_port = '3306'
 db_name = 'projet_sae'
 
 # Créez un moteur SQLAlchemy
-engine = create_engine(f'mysql+mysqlconnector://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}')
-
-# Créez une session SQLAlchemy
-Session = sessionmaker(bind=engine)
-session = Session()
+engine = create_engine(f'mysql+mysqlconnector://{db_username}:{db_password}@{db_host}:{db_port}/{db_name}', echo=True)
 
 # Liste des noms de séries
 noms_series = [
@@ -277,19 +273,11 @@ descriptions = [
     "La chute de la République romaine et la montée de l'Empire."
 ]
 
-# Requête SQL d'insertion
-insert_query = text("INSERT INTO serie (description) VALUES (:description)")
+series_formatees = [re.sub(r'[^a-zA-Z0-9]', '', serie).lower() for serie in noms_series]
 
-# Boucle pour insérer les descriptions pour chaque série
-for i in range(len(noms_series)):
-    nom_serie = noms_series[i]
-    description = descriptions[i]
+for titre, description in zip(series_formatees, descriptions):
+    update_query = text("UPDATE serie SET description = :description WHERE titre = :titre")
+    with engine.connect() as conn:
+        conn.execute(update_query, {"titre": titre, "description": description})
+        conn.commit()
 
-    # Exécutez la requête d'insertion avec les paramètres
-    session.execute(insert_query, {"nom_serie": nom_serie, "description": description})
-
-# Appliquez les modifications à la base de données
-session.commit()
-
-# Fermez la session
-session.close()
