@@ -108,7 +108,7 @@ class SeriesService {
             $table = ($language == 'fr') ? 'vf' : 'vo';
             
             $query = "
-                SELECT s.titre, av.poids AS poids
+                SELECT s.id_serie as id, s.titre, av.poids AS poids
                 FROM serie s
                 JOIN apparition_$table av ON s.id_serie = av.id_serie
                 JOIN mots_$table mv ON av.id_mot_$table = mv.id_mot_$table
@@ -211,6 +211,18 @@ class SeriesService {
             $lemmatizedWord = Lemmatizer::getLemma($word);
             return $lemmatizedWord;    
         }
+    }
+
+    // Fonction pour récup les infos d'une série lorsque l'utilisateur clique sur une série en particulière
+    public function getSerieData($serieId) {
+    
+        $sql = "SELECT titre, description FROM serie WHERE id_serie = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
+        $stmt->execute();
+        $serieData = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        return $serieData;
     }
     
 }

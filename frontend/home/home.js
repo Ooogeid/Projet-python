@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
     languageToggle.addEventListener('change', function() {
         if (languageToggle.checked) {
             saveLanguageSelection('en');
-            console.log("hello")
         } else {
             saveLanguageSelection('fr'); // Par défaut la recherche est en français
         }
@@ -131,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (results.length > 0) {
             html += '<ul class="ul-result">';
             results.forEach(function(result) {
-                html += '<li>' + result.titre + '</li>';
+                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' + result.titre + '</a></li>';
             });
             html += '</ul>';
         } else {
@@ -139,4 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         resultDiv.innerHTML = html;
     }
+
+
 });

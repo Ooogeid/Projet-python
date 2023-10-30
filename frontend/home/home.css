@@ -301,7 +301,7 @@ p{
     margin-top: 40px;
     padding: 20px;
     font-size: 18px;
-    color: #d7f4ff; /* Couleur du message d'erreur */
+    color: #d7f4ff;
 }
 
 /* Style pour les résultats de recherche */
@@ -319,6 +319,15 @@ h2 {
     grid-gap: 70px; /* Espacement entre les éléments */
 }
 
+.lien-serie{
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.lien-serie:hover{
+    color: #0056b3;
+}
 
 .loading-spinner {
     text-align: center;

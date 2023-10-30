@@ -1,0 +1,71 @@
+/* Ajout de la police Gotham, police général */
+@font-face {
+    font-family: 'Gotham Book';
+    src: url('../font/Gotham-Book.woff2') format('woff2'),
+         url('../font/Gotham-Book.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0; /* Supprimez les marges par défaut du corps */
+    font-family: 'Gotham Book', sans-serif;
+}
+
+.serie-container {
+    background: linear-gradient(to top, #003470, #141414);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff; /* Couleur du texte */
+    text-align: center;
+}
+
+.serie-details {
+    padding: 20px;
+}
+
+.serie-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px; /* Marge entre les détails et les actions */
+}
+
+.serie-title {
+    font-size: 1.5em;
+    margin-bottom: 50px;
+}
+
+.serie-description {
+    font-size: 1em;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #fff;
+}
+
+.like {
+    background-color: #007BFF; /* Couleur de fond du bouton */
+    color: #fff; /* Couleur du texte du bouton */
+    padding: 10px 20px; /* Rembourrage interne pour l'apparence */
+    border: none; /* Suppression de la bordure */
+    border-radius: 5px; /* Coins arrondis */
+    cursor: pointer; /* Curseur en main au survol */
+    transition: background-color 0.3s; /* Animation de couleur de fond au survol */
+    margin-right: 20px;
+}
+
+.like:hover {
+    background-color: #0056b3; /* Nouvelle couleur de fond au survol */
+}
