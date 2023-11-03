@@ -68,8 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         xhr.send();
     });
-
-
+    
     function saveLanguageSelection(language) { // On sauvegarde la sélection de la langue 
         localStorage.setItem('selectedLanguage', language);
         updateLanguageLabel(language);
@@ -129,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let html = '';
         if (results.length > 0) {
             html += '<ul class="ul-result">';
-            results.forEach(function(result) {
+            results.forEach(function(result) {;
                 html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' + result.titre + '</a></li>';
             });
             html += '</ul>';
@@ -139,5 +138,22 @@ document.addEventListener('DOMContentLoaded', function() {
         resultDiv.innerHTML = html;
     }
 
+    function getSeriesData() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '../../backend/controller.php', true);
+    
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const response = JSON.parse(xhr.responseText);
+                displayResults(response); // Affichez les résultats en utilisant la fonction displayResults()
+            } else {
+                console.error('Erreur :', xhr.status, xhr.statusText);
+            }
+        };
+    
+        xhr.send();
+    }
 
+    // Appel à la fonction pour récupérer les données des séries lors du chargement de la page
+    getSeriesData();
 });

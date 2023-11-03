@@ -24,11 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $storedPassword = $row['password'];
             if (password_verify($password, $storedPassword)) {
                 session_start(); // Démarrez la session
-                $_SESSION['username'] = $username; // on stock le username en session 
+                $_SESSION['username'] = $username; // on stock le username en session
+                $_SESSION['id_users'] = $row['id_users']; // on stock l'id en session
                 $response = [
                     'success' => true,
                     'message' => 'Connecté avec succès',
-                    'username' => $username // Incluez le nom d'utilisateur dans la réponse
+                    'username' => $username
                 ];
             } else {
                 $response = [

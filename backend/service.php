@@ -177,7 +177,7 @@ class SeriesService {
     private function searchSeriesByTitle($keywords) {
         // Recherche de séries dont le titre correspond au mot-clé
         $query = "
-            SELECT s.titre, av.poids AS poids
+            SELECT s.id_serie as id, s.titre, av.poids AS poids
             FROM serie s
             JOIN apparition_vo av ON s.id_serie = av.id_serie
             WHERE s.titre LIKE :keyword
@@ -215,16 +215,55 @@ class SeriesService {
 
     // Fonction pour récup les infos d'une série lorsque l'utilisateur clique sur une série en particulière
     public function getSerieData($serieId) {
-    
+        
         $sql = "SELECT titre, description FROM serie WHERE id_serie = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
         $stmt->execute();
         $serieData = $stmt->fetch(PDO::FETCH_ASSOC);
-    
         return $serieData;
     }
-    
+
+    // Fonction pour ajouter un like à une série pour un user donnée
+    public function addLike($serieId, $userId) {
+        $sql = "INSERT INTO likes (id_serie, id_users, date_liked) VALUES (:id, :id_users, NOW())";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
+        $stmt->bindParam(':id_users', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    public function getAllSeries(){
+        $sql = "SELECT id_serie as id, titre FROM serie ORDER BY titre ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $series;
+    }
+
+    public function getMaliste(){
+        $sql = "SELECT s.id_serie as id, s.titre
+                FROM serie s
+                JOIN likes l ON s.id_serie = l.id_serie
+                WHERE l.id_users = :user_id 
+                ORDER BY s.titre ASC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
+        $stmt->execute();
+        $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $series;
+    }
+
+    public function getSeriesByCategories(){
+        $placeholders = implode(',', array_fill(0, count($categories), '?'));
+        $query = "SELECT * FROM series WHERE categorie IN ($placeholders) ORDER BY categorie";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($categories);
+        $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $series;
+    }
+
 }
 ?>
 
