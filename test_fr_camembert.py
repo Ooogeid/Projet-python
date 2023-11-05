@@ -111,7 +111,34 @@ Vous pouvez également essayer plusieurs valeurs de n_clusters et évaluer les r
 
 '''
 
-from transformers import CamembertTokenizer, CamembertForMaskedLM
+'''
+# Fonction pour nettoyer et lemmatiser les mots avec CamemBERT
+def clean_word(word):
+    word = word.lower()
+
+    # Utiliser CamemBERT pour remplir l'espace réservé masqué
+    input_text = f"La phrase contient le mot {tokenizer.mask_token} et d'autres mots."
+
+    #masked_index = input_text.index(tokenizer.mask_token)
+    input_text = input_text.replace(tokenizer.mask_token, word)
+    # Tokenization avec CamemBERT
+    inputs = tokenizer(input_text, return_tensors="pt")
+
+    mask_token_index = torch.where(inputs["input_ids"] == tokenizer.mask_token_id)[1]
+    
+
+    # Prédire le mot masqué avec CamemBERT
+    with torch.no_grad():
+        logits = model(**inputs).logits
+    predicted_token_ids = torch.argmax(logits, dim=-1)
+    predicted_word = tokenizer.decode(predicted_token_ids[0]).strip()
+
+    #print(word + " -> " + predicted_word)
+
+    return predicted_word
+'''
+
+from transformers import CamembertForTokenClassification, CamembertForMaskedLM, CamembertTokenizer
 #from tokenizers import Tokenizer, models, trainers, pre_tokenizers, decoders
 import spacy
 import pandas as pd
@@ -122,34 +149,47 @@ import numpy as np
 import torch
 
 # Charger le modèle SpaCy
-nlp = spacy.load("fr_core_news_sm")
+#nlp = spacy.load("fr_core_news_sm")
 
 # Charger le tokenizer et le modèle CamemBERT
+#model_name = "camembert-base"
+#tokenizer = CamembertTokenizer.from_pretrained("camembert-base")
+#model = CamembertForMaskedLM.from_pretrained("camembert-base")
+#model.eval()
+
+#camembert = CamembertForMaskedLM.from_pretrained('camembert-large')
 model_name = "camembert-base"
-tokenizer = CamembertTokenizer.from_pretrained("camembert-base")
-model = CamembertForMaskedLM.from_pretrained("camembert-base")
+model = CamembertForTokenClassification.from_pretrained(model_name)
+tokenizer = CamembertTokenizer.from_pretrained(model_name)
 model.eval()
 
-# Fonction pour nettoyer et lemmatiser les mots avec CamemBERT
-def clean_word(word):
-    word = word.lower()
+def get_probas_from_logits(logits):
+    return logits.softmax(-1)
 
-    # Utiliser CamemBERT pour remplir l'espace réservé masqué
-    input_text = f"La phrase contient le mot {tokenizer.mask_token} et d'autres mots."
-    #masked_index = input_text.index(tokenizer.mask_token)
-    input_text = input_text.replace(tokenizer.mask_token, word)
-    
-    # Tokenization avec CamemBERT
-    inputs = tokenizer(input_text, return_tensors="pt")
-    mask_token_index = torch.where(inputs["input_ids"] == tokenizer.mask_token_id)[1]
+def predict_mlm_words(word, tokenizer, model):
+    # Tokenize les entrées
+    inputs = tokenizer(word, return_tensors="pt", padding=True, truncation=True)
 
-    # Prédire le mot masqué avec CamemBERT
+    # Effectue les prédictions
     with torch.no_grad():
-        logits = model(**inputs).logits
-    predicted_token_ids = torch.argmax(logits, dim=-1)
-    predicted_word = tokenizer.decode(predicted_token_ids[0, mask_token_index]).strip()
+        model_output = model(**inputs)
 
-    return predicted_word
+    # Utilisez votre fonction pour obtenir les probabilités
+    #batch_mask_probas = get_probas_from_logits(model_output.logits)
+
+    # Récupérez les indices des mots prédits
+    predicted_token_ids = model_output.logits.argmax(dim=-1)
+
+    # Décodez les indices pour obtenir les mots prédits
+    predicted_words = [tokenizer.decode(token_id) for token_id in predicted_token_ids[0]]
+    
+    #text = "Les chats aiment chasser les souris."
+    #tokens = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+    #print(tokens)
+
+    # Retourne les probabilités et les tokens les plus probables
+    print(predicted_words)
+    return predicted_words
 
 # Fonction pour traiter un fichier CSV avec clustering
 def clean_with_cluster(input_csv_path, output_csv_path):
@@ -157,7 +197,8 @@ def clean_with_cluster(input_csv_path, output_csv_path):
     data = pd.read_csv(input_csv_path, sep=";", encoding='latin-1')
     data = data[data['Mot'].apply(lambda x: isinstance(x, str))]
     # Nettoyer et lemmatiser les mots
-    data['Mot_nettoye'] = data['Mot'].apply(clean_word)
+    data['Mot_nettoye'] = data['Mot'].apply(lambda word: predict_mlm_words(word, tokenizer, model))
+    print(data['Mot_nettoye'])
 
     # Vectorisation des mots nettoyés
     tfidf_vectorizer = TfidfVectorizer()
