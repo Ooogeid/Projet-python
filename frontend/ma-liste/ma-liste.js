@@ -27,7 +27,7 @@ function displayResults(results) {
         });
         html += '</ul>';
     } else {
-        html += 'Aucun résultat trouvé.';
+        html += 'C\'est un peu vide ici...';
     }
     resultDiv.innerHTML = html;
 }

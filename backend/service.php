@@ -223,12 +223,42 @@ class SeriesService {
         $serieData = $stmt->fetch(PDO::FETCH_ASSOC);
         return $serieData;
     }
+    
+    // Fonction pour vérifier si un like existe déjà pour une série et un user donnée
+    public function getLike($serieId, $userId) {
+        $sql = "SELECT * FROM likes WHERE id_serie = :id_serie AND id_users = :id_users";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id_serie', $serieId, PDO::PARAM_INT);
+        $stmt->bindParam(':id_users', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        $like = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $like;
+    }
 
     // Fonction pour ajouter un like à une série pour un user donnée
     public function addLike($serieId, $userId) {
-        $sql = "INSERT INTO likes (id_serie, id_users, date_liked) VALUES (:id, :id_users, NOW())";
+        $existingLike = $this->getLike($serieId, $userId); // On vérifie si le like existe déjà
+        if ($existingLike) {
+            return; // on ignore l'ajout du like si il existe déjà
+        }
+        else{
+            $sql = "INSERT INTO likes (id_serie, id_users, date_liked) VALUES (:id, :id_users, NOW())";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
+            $stmt->bindParam(':id_users', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+        }
+    }
+
+    // Fonction pour supprimer un like à une série pour un user donnée
+    public function removeLike($serieId, $userId){
+        $existingLike = $this->getLike($serieId, $userId); 
+        if(!$existingLike){
+            return; // on ignore la suppression du like si il n'existe pas
+        }
+        $sql = "DELETE FROM likes WHERE id_serie = :id_serie AND id_users = :id_users";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
+        $stmt->bindParam(':id_serie', $serieId, PDO::PARAM_INT);
         $stmt->bindParam(':id_users', $userId, PDO::PARAM_INT);
         $stmt->execute();
     }

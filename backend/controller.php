@@ -23,14 +23,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $service->addLike($serieId, $userId);
             $result = "Like ajouté avec succès";
         } 
+        elseif(isset($credentials['remove'])){
+            $serieId = $credentials['remove'];
+            $userId = $_SESSION['id_users'];
+            $service->removeLike($serieId, $userId);
+            $result = "Like supprimé avec succès";
+        }
         
         header('Content-Type: application/json');
         echo json_encode($result);
     } catch (PDOException $e) {
         echo 'Erreur de connexion à la base de données : ' . $e->getMessage();
     }
-
 } 
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Gérer les requêtes GET avec un ID spécifié
     try {
@@ -48,7 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $result = ['error' => 'Série non trouvée'];
                 http_response_code(404);
             }
-        } elseif (isset($_GET['maListe'])) {  // Récupération de la liste des séries de l'utilisateur
+        } 
+        elseif (isset($_GET['maListe'])) {  // Récupération de la liste des séries de l'utilisateur
             $series = $service->getMaliste();
             $result = $series;
         } 

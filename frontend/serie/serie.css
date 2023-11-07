@@ -32,8 +32,8 @@ body, html {
 .serie-actions {
     display: flex;
     align-items: center;
+    gap: 30px;
     justify-content: center;
-    margin-top: 30px; /* Marge entre les détails et les actions */
 }
 
 .serie-title {
@@ -63,9 +63,47 @@ a:hover {
     border-radius: 5px; /* Coins arrondis */
     cursor: pointer; /* Curseur en main au survol */
     transition: background-color 0.3s; /* Animation de couleur de fond au survol */
-    margin-right: 20px;
 }
 
 .like:hover {
     background-color: #0056b3; /* Nouvelle couleur de fond au survol */
+}
+
+.like-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s, visibility 0s linear 0.5s;
+}
+  
+.like-popup.show {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+}
+
+.like-popup-message {
+    font-size: 16px;
+}
+
+.remove {
+    background-color: #ff0000;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+  
+.remove:hover {
+    background-color: #cc0000;
 }
