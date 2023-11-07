@@ -255,12 +255,13 @@ class SeriesService {
     }
 
     public function getSeriesByCategories(){
-        $placeholders = implode(',', array_fill(0, count($categories), '?'));
-        $query = "SELECT * FROM series WHERE categorie IN ($placeholders) ORDER BY categorie";
+        $query = "SELECT s.id_serie as id, s.titre, c.nom 
+        FROM serie s
+        JOIN categorie c ON s.id_categorie = c.id_categorie
+        ORDER BY s.id_categorie";
         $stmt = $this->db->prepare($query);
-        $stmt->execute($categories);
+        $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         return $series;
     }
 

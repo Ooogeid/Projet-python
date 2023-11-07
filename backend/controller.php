@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $result = $series;
         } 
         elseif(isset($_GET['categorie'])){
-            $series = $service->getSeriesByCategorie($categorie);
+            $series = $service->getSeriesByCategories();
             $result = $series;
         }
         else {
@@ -61,16 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $series = $service->getAllSeries();
             $result = $series;
         }
-
-        header('Content-Type: application/json;');
+        
+        header('Content-Type: application/json');
         echo json_encode($result);
     } catch (PDOException $e) {
         echo 'Erreur de connexion à la base de données : ' . $e->getMessage();
     }
-} else {
-    // Gérer d'autres cas de requêtes non autorisées
-    http_response_code(405);
-    echo 'Méthode non autorisée.';
 }
 
 
