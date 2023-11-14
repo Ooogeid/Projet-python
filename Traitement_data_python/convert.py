@@ -34,7 +34,7 @@ def process_series(root_directory, output_csv_directory):
             print(file_path)
             with open(file_path, 'r', encoding='latin-1', errors='ignore') as f:
                 contenu = f.read()
-            
+            langue = ''
             if contenu.strip():
                 langue = detect(contenu)
             

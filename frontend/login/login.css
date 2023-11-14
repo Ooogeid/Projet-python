@@ -1,0 +1,126 @@
+/* Ajout de la police Gotham, police général */
+@font-face {
+    font-family: 'Gotham Book';
+    src: url('../font/Gotham-Book.woff2') format('woff2'),
+         url('../font/Gotham-Book.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Style de base pour le corps de la page */
+body {
+    font-family: 'Gotham Book', sans-serif;
+    background: linear-gradient(to bottom, #003470, #000000);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.ctr-main {
+    display: grid;
+    grid-template-rows: auto auto; /* Utilisation d'une grille avec deux rangées de taille automatique */
+    border: 2px solid black;
+    border-radius: 10px;
+    max-height: 600px; /* Limite la hauteur du conteneur principal à 600px */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo img {
+    width: 160px;
+    height: 160px;
+}
+
+.login-container {
+    background: #fff;
+    border-top: 1px solid black;
+    border-bottom-right-radius: 40px 40px;
+    border-bottom-left-radius: 40px 40px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 20px;
+    padding-top: 30px;
+    width: 300px;
+    height: 320px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Titre de la page */
+.login-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Styles pour les champs de formulaire */
+.form-group {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 90%;
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+/* Bouton de connexion */
+.login-button {
+    font-family: 'Gotham Book', sans-serif;
+    background-color: #000000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-errorMessage{
+    display: block; 
+    color: red; 
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    color: #003470;
+}
+
+/* Style pour les liens */
+.login-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.login-links a {
+    text-decoration: none;
+    color: #000000;
+    margin: 0 10px;
+}
+
+.login-links a:hover {
+    color: #003470;
+}
+
+footer {
+    padding: 20px;
+    font-style: italic;
+}

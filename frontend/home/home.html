@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+    <link rel="stylesheet" type="text/css" href="home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<head>
+    <title>RétroFlix</title>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <ul>
+                <li><img src="../img/retroflix-logo.png" width="60px"></li>
+                <li><a href="../home/home.html">Accueil</a></li>
+                <li><a href="../categorie/categorie.html">Catégories</a></li>
+                <li><a href="../ma-liste/ma-liste.html">Ma liste</a></li>
+                <li class="right-side">
+                    <div class="bar">
+                        <div class="input-container">
+                            <img src="../img/loupe.png" alt="Loupe" class="search-icon" id="searchIcon">
+                            <input class="input" type="text" id="credentials" placeholder="Entrez un ou plusieurs mots">
+                        </div>
+                    </div>                    
+                    <div class="language-selection">
+                        <span class="language-span" id="language-span">Français</span>
+                        <label class="switch">
+                            <input type="checkbox" id="languageToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="user-info">
+                        <span id="usernameDisplay" class="username"></span>
+                        <img src="../img/profile.png">
+                        <ul class="dropdown">
+                            <li><a href="../login/login.html" id="logoutLink">Se déconnecter</a></li>
+                            <li><a href="#">Changer d'utilisateur   </a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="ctr-main">
+        <h1>Bienvenue sur RétroFlix, toutes vos séries des années 2000 !</h1>
+        <div class="loading-spinner" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div id="result"></div>
+    </div>
+    <script src="home.js"></script>
+
+</body>
+</html>
