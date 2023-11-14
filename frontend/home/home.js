@@ -127,8 +127,10 @@ document.addEventListener('DOMContentLoaded', function() {
         let html = '';
         if (results.length > 0) {
             html += '<ul class="ul-result">';
-            results.forEach(function(result) {;
-                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' + result.titre + '</a></li>';
+            results.forEach(function(result) {
+                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
+                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+                html += '</a></li>';
             });
             html += '</ul>';
         } else {
