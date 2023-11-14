@@ -295,6 +295,58 @@ class SeriesService {
         return $series;
     }
 
+    // Fonction pour récupérer les mots-clés importants des séries likés
+    public function getMalisteKeywords(){
+        $sql = "
+            SELECT mv.Libelle AS keyword
+            FROM serie s
+            JOIN apparition_vo av ON s.id_serie = av.id_serie
+            JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
+            JOIN likes l ON s.id_serie = l.id_serie
+            WHERE l.id_users = :user_id
+            GROUP BY mv.Libelle
+            ORDER BY av.poids DESC
+            LIMIT 20";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
+        $stmt->execute();
+        $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        return $keywords;
+    }
+
+    public function recommandation(){
+        // Récupérer les mots clés des séries likées par l'utilisateur
+        $keywords = $this->getMalisteKeywords();
+        foreach($keywords as $keyword){
+            echo $keyword, " ";
+        }
+        // Requête de recherche pour les séries recommandées
+        $query = "
+            SELECT s.id_serie AS id, s.titre, av.poids AS poids
+            FROM serie s
+            JOIN apparition_vo av ON s.id_serie = av.id_serie
+            JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
+            WHERE mv.Libelle IN ('" . implode("','", $keywords) . "')
+            AND s.titre NOT IN (
+                SELECT s.titre
+                FROM serie s
+                JOIN likes l ON s.id_serie = l.id_serie
+                WHERE l.id_users = :user_id
+            )
+            ORDER BY poids DESC
+            LIMIT 10";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $result;
+    }
+
+
 }
 ?>
 

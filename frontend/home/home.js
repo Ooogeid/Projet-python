@@ -105,8 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
-                    displayResults(response);
-
+                    displayResults(response['series']); 
                     // Masquez le spinner et réactivez le bouton de recherche
                     spinner.style.display = 'none';
                     searchButton.disabled = false;

@@ -45,12 +45,14 @@ makeRequest(`../../backend/controller.php?id=${serieId}`)
     // Comparez la série sélectionnée avec les séries de la liste
     const serieEstDansLaListe = maListe.some(serie => serie.id === serieId);
 
-    // Affichez ou masquez le bouton "Retirer" en fonction du résultat
+    // Affichez ou masquez les boutons en fonction du résultat
     const removeButton = document.getElementById('remove');
     if (serieEstDansLaListe) {
       removeButton.style.display = 'block';
+      likeButton.style.display = 'none';
     } else {
       removeButton.style.display = 'none';
+      likeButton.style.display = 'block';
     }
   })
   .catch(function(error) {
