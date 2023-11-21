@@ -107,13 +107,15 @@ class SeriesService {
 
             // Langue française ou anglaise
             $table = ($language == 'fr') ? 'vf' : 'vo';
-            
             $query = "
                 SELECT s.id_serie as id, s.titre, av.poids AS poids
                 FROM serie s
                 JOIN apparition_$table av ON s.id_serie = av.id_serie
-                JOIN mots_$table mv ON av.id_mot_$table = mv.id_mot_$table
-                WHERE mv.Libelle = :keyword
+                WHERE 1
+                AND av.id_mot_$table = 
+                (SELECT mv.id_mot_$table 
+                FROM mots_$table mv
+                WHERE mv.Libelle LIKE :keyword LIMIT 1) 
                 ORDER BY poids DESC
                 LIMIT 20";
     
@@ -321,7 +323,9 @@ class SeriesService {
     public function recommandation(){
         // Récupérer les mots clés des séries likées par l'utilisateur
         $keywords = $this->getMalisteKeywords();
-
+        foreach($keywords as $i){
+            echo $i, " ";
+        };
         // Requête de recherche pour les séries recommandées
         $query = "
             SELECT s.id_serie AS id, s.titre, av.poids AS poids
