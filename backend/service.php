@@ -224,7 +224,6 @@ class SeriesService {
         $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
         $stmt->execute();
         $serieData = $stmt->fetch(PDO::FETCH_ASSOC);
-        $serieData['description'] = utf8_decode($serieData['description']);
         return $serieData;
     }
     
@@ -299,8 +298,7 @@ class SeriesService {
         return $series;
     }
 
-    // Fonction pour récupérer les mots-clés importants des séries likés
-    public function getMalisteKeywords(){
+    public function getSerieKeywords($serieId){
         $sql = "
             SELECT mv.Libelle AS keyword
             FROM serie s
@@ -308,12 +306,14 @@ class SeriesService {
             JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
             JOIN likes l ON s.id_serie = l.id_serie
             WHERE l.id_users = :user_id
+            AND s.id_serie = :serie_id
             GROUP BY mv.Libelle
             ORDER BY av.poids DESC
             LIMIT 40";
         
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
+        $stmt->bindParam(':serie_id', $serieId, PDO::PARAM_INT);
         $stmt->execute();
         $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
         
@@ -321,33 +321,68 @@ class SeriesService {
     }
 
     public function recommandation(){
-        // Récupérer les mots clés des séries likées par l'utilisateur
-        $keywords = $this->getMalisteKeywords();
-        foreach($keywords as $i){
-            echo $i, " ";
-        };
-        // Requête de recherche pour les séries recommandées
-        $query = "
-            SELECT s.id_serie AS id, s.titre, av.poids AS poids
-            FROM serie s
-            JOIN apparition_vo av ON s.id_serie = av.id_serie
-            JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
-            LEFT JOIN (
-                SELECT id_serie
-                FROM likes
-                WHERE id_users = :user_id
-            ) l ON s.id_serie = l.id_serie
-            WHERE mv.Libelle IN ('" . implode("','", $keywords) . "')
-            AND l.id_serie IS NULL
-            ORDER BY poids DESC
-            LIMIT 10";
+        $series = $this->getMaliste();
+    
+        // Tableau pour stocker tous les mots clés
+        $allKeywords = [];
         
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach($series as $serie){
+            $id = $serie['id'];
+    
+            // Récupérer les mots clés des séries likées par l'utilisateur
+            $keywords = $this->getSerieKeywords($id);
+    
+            // Ajouter les mots clés à $allKeywords
+            $allKeywords = array_merge($allKeywords, $keywords);
+        }
+        // foreach($allKeywords as $i){
+        //     echo $i, " ";
+        // }
         
-        return $result;
+        // Tableau pour stocker les séries recommandées
+        $recommendedSeries = [];
+    
+        // Pour chaque mot clé, trouver la série avec le poids le plus important
+        foreach($allKeywords as $keyword){
+            $query = "
+                SELECT s.id_serie AS id, s.titre, av.poids AS poids
+                FROM serie s
+                JOIN apparition_vo av ON s.id_serie = av.id_serie
+                JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
+                LEFT JOIN (
+                    SELECT id_serie
+                    FROM likes
+                    WHERE id_users = :user_id
+                ) l ON s.id_serie = l.id_serie
+                WHERE mv.Libelle = :keyword
+                AND l.id_serie IS NULL
+                ORDER BY poids DESC
+                LIMIT 1";
+    
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
+            $stmt->bindParam(':keyword', $keyword, PDO::PARAM_STR);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if($result){
+                $recommendedSeries[$result['id']] = $result;
+            }
+        }
+        // foreach($recommendedSeries as $i){
+        //     foreach($i as $x){
+        //         echo $x, " ";
+        //     }
+        // }
+        // Trier les séries recommandées par poids décroissant
+        usort($recommendedSeries, function($a, $b) {
+            return $b['poids'] - $a['poids'];
+        });
+    
+        // Limiter le nombre de séries recommandées à 20
+        $recommendedSeries = array_slice($recommendedSeries, 0, 20);
+    
+        return array_values($recommendedSeries);
     }
 
 
