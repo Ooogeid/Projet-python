@@ -23,7 +23,9 @@ function displayResults(results) {
     if (results.length > 0) {
         html += '<ul class="ul-result">';
         results.forEach(function(result) {;
-            html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' + result.titre + '</a></li>';
+            html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' +
+            '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">' +
+            '</a></li>';
         });
         html += '</ul>';
     } else {
