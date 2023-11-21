@@ -36,6 +36,9 @@ makeRequest(`../../backend/controller.php?id=${serieId}`)
     titre.textContent = serie.titre;
     description.textContent = serie.description;
 
+    const img_series = document.getElementById('serie-image');
+    img_series.setAttribute('src', "../img/img_series/" + serieId + ".jpg");
+
     // Faire une autre requête AJAX pour vérifier si la série est dans la liste
     return makeRequest('../../backend/controller.php?maListe');
   })
