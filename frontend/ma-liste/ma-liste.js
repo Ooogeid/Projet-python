@@ -25,7 +25,7 @@ function displayResults(results) {
         results.forEach(function(result) {;
             html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' +
             '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">' +
-            '</a></li>';
+            '<p style="margin-top: 20px;">' + result.titre + '</p>' + '</a></li>';
         });
         html += '</ul>';
     } else {
