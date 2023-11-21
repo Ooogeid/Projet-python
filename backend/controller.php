@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Gestion de la recherche de mots clés
         if (isset($credentials['keyword'])) {
-            $result = $service->findSeries($credentials);
+            $result['series'] = $service->findSeries($credentials);
+            $recommendedSeries = $service->recommandation();
+            $result['recommandation'] = $recommendedSeries;
         }
         // Gestion de l'ajout de like 
         elseif (isset($credentials['like'])) {
