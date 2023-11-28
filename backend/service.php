@@ -279,7 +279,7 @@ class SeriesService {
     }
 
     public function getMaliste(){
-        $sql = "SELECT s.id_serie as id, s.titre
+        $sql = "SELECT s.id_serie as id, s.titre, s.description
                 FROM serie s
                 JOIN likes l ON s.id_serie = l.id_serie
                 WHERE l.id_users = :user_id 

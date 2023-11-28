@@ -5,20 +5,26 @@ from collections import defaultdict
 from langdetect import detect
 
 # Fonction pour extraire les mots d'un fichier SRT, les compter et les stocker dans un dictionnaire
-def extract_words_from_srt(input_file):
+def extract_words_from_srt(input_file, language):
     word_count = defaultdict(int)
 
     with open(input_file, 'r', encoding='latin-1') as file:
         srt_content = file.read()
-    
-    # Remplacer les caractères de ponctuation par des espaces et diviser en mots
-    words = re.findall(r'\b\w+\b', srt_content.lower())  # Utilisez lower() pour tout mettre en minuscules
+
+    # Utiliser une expression régulière pour capturer les mots, y compris les apostrophes,
+    # uniquement pour les mots anglais
+    if language == 'Anglais':
+        words = re.findall(r'\b[\w\']+\b', srt_content.lower())
+    else:
+        words = re.findall(r'\b\w+\b', srt_content.lower())
 
     for word in words:
-        if not word.isdigit():  # Exclure les mots composés uniquement de chiffres
+        if not word.isdigit():
             word_count[word] += 1
-    
-    return word_count  # Retournez un dictionnaire de mots et occurrences
+
+    return word_count
+
+
 
 # Fonction pour traiter une série
 def process_series(root_directory, output_csv_directory):
@@ -43,7 +49,7 @@ def process_series(root_directory, output_csv_directory):
             else:
                 language = 'Anglais'
 
-            word_count = extract_words_from_srt(os.path.join(root, file))
+            word_count = extract_words_from_srt(os.path.join(root, file), language)
 
             if language == 'Anglais':
                 for word, count in word_count.items():
@@ -71,7 +77,7 @@ def process_series(root_directory, output_csv_directory):
             csv_writer.writerow([word, count])
 
 def main():
-    series_directory = '../sous-titres'
+    series_directory = r'C:\wamp64\www\Projet_sae\data\sous-titres'
     output_directory = '../csv'
 
     # Parcourir tous les dossiers de séries dans le répertoire de séries

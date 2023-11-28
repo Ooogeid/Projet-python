@@ -1,0 +1,7 @@
+Ordre des fichiers de traitement python : 
+
+1) Dezip.py (s'occupe de dézipper toutes les archives récupérés)
+2) Trie_sous_titres.py (s'occupe de mettre pour chaque répertoire de série tout les fichiers srt au même niveau, pas qu'il n'y ai de dossier dans le dossier de série)
+3) convert.py (s'occupe de traiter chaque fichier srt et de créer un fichier csv vf et vo pour chaque série)
+4) Process vo et vf
+5)delete_minimal_occurence.py

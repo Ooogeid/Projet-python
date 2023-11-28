@@ -344,3 +344,10 @@ h2 {
     width: 200px;  
     height: 250px;
 }
+
+.class-css{
+    border-radius: 10px;
+    line-gap-override: 10px;
+}
+
+

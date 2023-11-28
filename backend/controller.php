@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Gestion de la recherche de mots clés
         if (isset($credentials['keyword'])) {
             $result['series'] = $service->findSeries($credentials);
-            $recommendedSeries = $service->recommandation();
-            $result['recommandation'] = $recommendedSeries;
+            // $recommendedSeries = $service->recommandation();
+            // $result['recommandation'] = $recommendedSeries;
         }
         // Gestion de l'ajout de like 
         elseif (isset($credentials['like'])) {
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             // récupération des données de la série pour le détail
             $serieData = $service->getSerieData($serieId);
             if ($serieData) {
-                $result['description'] = utf8_encode($serieData['description']);
+                $result['description'] = $serieData['description'];
                 $result['titre'] = utf8_encode($serieData['titre']);
             } else {
                 $result = ['error' => 'Série non trouvée'];

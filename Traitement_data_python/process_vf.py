@@ -94,7 +94,7 @@ def process_series(series_directory, output_directory):
             clean_with_cluster(input_csv_path, output_csv_path)
 
 # Exemple d'utilisation
-series_directory = '../csv'  # Répertoire contenant les séries CSV
+series_directory = r"C:/wamp64/www/Projet_sae/data/csv"  # Répertoire contenant les séries CSV
 output_directory = '../csv_clean'  # Répertoire de sortie pour les CSV traités
 
 # Créer le répertoire de sortie s'il n'existe pas

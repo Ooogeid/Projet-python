@@ -30,7 +30,7 @@ def supprimer_fichiers_archive(repertoire):
                     print(f"Erreur lors de la suppression du fichier d'archive '{chemin_fichier_archive}': {str(e)}")
 
 # Chemin d'accès au répertoire
-chemin_repertoire = r"C:\Users\diego\Documents\IUT\S5\SAE\sous-titres"
+chemin_repertoire = r"C:\wamp64\www\Projet_sae\data\sous-titres"
 
 # Extraire les fichiers d'archive et supprimer les fichiers d'archive correspondants
 extraire_fichiers_archive(chemin_repertoire)
