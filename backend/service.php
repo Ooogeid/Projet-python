@@ -323,9 +323,6 @@ class SeriesService {
     public function recommandation(){
         // Récupérer les mots clés des séries likées par l'utilisateur
         $keywords = $this->getMalisteKeywords();
-        foreach($keywords as $i){
-            echo $i, " ";
-        };
         // Requête de recherche pour les séries recommandées
         $query = "
             SELECT s.id_serie AS id, s.titre, av.poids AS poids

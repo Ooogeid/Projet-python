@@ -128,9 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (results.length > 0) {
             html += '<ul class="ul-result">';
             results.forEach(function(result) {
-                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
-                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
-                html += '</a></li>';
+                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' +
+            '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">' +
+            '<p style="margin-top: 20px;">' + result.titre + '</p>' + '</a></li>';
             });
             html += '</ul>';
         } else {
