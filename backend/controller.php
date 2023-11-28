@@ -66,8 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $result = $series;
         }
         else {
-            // récupération des données de la série pour le détail
-            $series = $service->getAllSeries();
+            // Récupération des paramètres de pagination depuis la requête
+            $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+            $seriesPerPage = 10; // Nombre de séries par page
+        
+            // Récupération des données de la série pour la page donnée
+            $series = $service->getAllSeries($page, $seriesPerPage);
             $result = $series;
         }
         

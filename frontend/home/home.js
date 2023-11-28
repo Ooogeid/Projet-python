@@ -126,27 +126,37 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayResults(results) {
         let html = '';
         if (results.length > 0) {
-            html += '<ul class="ul-result">';
-            results.forEach(function(result) {
-                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
-                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
-                html += '</a></li>';
-            });
-            html += '</ul>';
+                html += '<ul class="ul-result">';
+                results.forEach(function(result) {
+                    html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
+                    html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+                    html += '</a></li>';
+                });
+                html += '</ul>';
         } else {
             html += 'Aucun résultat trouvé.';
         }
         resultDiv.innerHTML = html;
     }
 
-    function getSeriesData() {
+    function getCurrentPage() {
+        const url = new URL(window.location.href);
+        const params = url.searchParams;
+        const currentPage = parseInt(params.get('page'));
+      
+        return currentPage || 1; // Si le paramètre 'page' n'est pas présent dans l'URL, retourne 1 par défaut
+    }
+
+    function getSeriesData(page) {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', '../../backend/controller.php', true);
+        const url = '../../backend/controller.php?page=' + page; // Inclure le paramètre de pagination dans l'URL
+    
+        xhr.open('GET', url, true);
     
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
-                displayResults(response); // Affichez les résultats en utilisant la fonction displayResults()
+                displayResults(response); // Afficher les résultats en utilisant la fonction displayResults()
             } else {
                 console.error('Erreur :', xhr.status, xhr.statusText);
             }
@@ -155,6 +165,16 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send();
     }
 
-    // Appel à la fonction pour récupérer les données des séries lors du chargement de la page
-    getSeriesData();
+    const nextPageButton = document.getElementById('nextPageButton'); // Supposons que vous avez un bouton avec l'id "nextPageButton"
+    getSeriesData(1); // Par défaut sur 1
+
+    nextPageButton.addEventListener('click', function() {
+    // Récupérer le numéro de page actuel (peut être stocké dans une variable)
+    const currentPage = getCurrentPage(); // Fonction à implémenter qui retourne le numéro de page actuel
+
+    // Calculer le numéro de la page suivante
+    const nextPage = currentPage + 1;
+    
+    getSeriesData(nextPage);
+    });
 });
