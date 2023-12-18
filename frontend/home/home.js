@@ -9,6 +9,21 @@ xhr.onload = function () {
         if (response.success && response.username) {
             // Une session est active, l'utilisateur est connecté
             document.getElementById('usernameDisplay').textContent = response.username;
+
+            const recommenderXhr = new XMLHttpRequest();
+            recommenderXhr.open('GET', '../../backend/controller.php?recommandation=true', true);
+            
+            recommenderXhr.onload = function () {
+                if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
+                    const recommandations = JSON.parse(recommenderXhr.responseText);
+                    console.log('Recommandations:', recommandations);
+                } else {
+                    console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
+                }
+            };
+            
+            recommenderXhr.send();
+
         } else {
             // Pas de session active, redirigez vers la page de connexion
             window.location.href = '../login/login.html';
@@ -165,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send();
     }
 
+    // A TRAVAILLER ENCORE (MENU DEROULANT POUR LES SERIES)
     const nextPageButton = document.getElementById('nextPageButton'); // Supposons que vous avez un bouton avec l'id "nextPageButton"
     getSeriesData(1); // Par défaut sur 1
 

@@ -15,8 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Gestion de la recherche de mots clés
         if (isset($credentials['keyword'])) {
             $result['series'] = $service->findSeries($credentials);
-            // $recommendedSeries = $service->recommandation();
-            // $result['recommandation'] = $recommendedSeries;
         }
         // Gestion de l'ajout de like 
         elseif (isset($credentials['like'])) {
@@ -57,6 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 http_response_code(404);
             }
         } 
+        elseif (isset($_GET['recommandation'])) {
+            $recommendedSeries = $service->recommandation();
+            $result['recommandation'] = $recommendedSeries;
+        }
         elseif (isset($_GET['maListe'])) {  // Récupération de la liste des séries de l'utilisateur
             $series = $service->getMaliste();
             $result = $series;
