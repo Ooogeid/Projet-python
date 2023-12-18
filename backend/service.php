@@ -266,13 +266,10 @@ class SeriesService {
         $stmt->execute();
     }
 
-    public function getAllSeries($page, $seriesPerPage){
-        $offset = ($page - 1) * $seriesPerPage;
+    public function getAllSeries(){
     
-        $sql = "SELECT id_serie as id, titre FROM serie ORDER BY titre ASC LIMIT :limit OFFSET :offset";
+        $sql = "SELECT id_serie as id, titre FROM serie ORDER BY titre ASC";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':limit', $seriesPerPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $series;

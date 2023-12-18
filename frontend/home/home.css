@@ -350,4 +350,49 @@ h2 {
     line-gap-override: 10px;
 }
 
+.series-container {
+    white-space: nowrap;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    display: flex; /* Utilisez flexbox pour aligner les éléments horizontalement */
+    justify-content: space-between; /* Placez les éléments à chaque extrémité de la barre déroulante */
+    align-items: center;
+}
 
+.series-container ul {
+    display: inline-flex; /* Utilisez flex au lieu de inline-block pour garder les éléments en ligne */
+    transition: transform 0.5s ease; /* Ajoutez une transition de 0.5 seconde avec une accélération fluide (ease) */
+}
+
+.ul-result {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.ul-result li {
+    margin-right: 10px;
+}
+
+.scroll-left-button,
+.scroll-right-button {
+    font-size: 24px; /* Ajustez la taille de la police selon vos préférences */
+    background-color: transparent; /* Retirez la couleur de fond actuelle */
+    border: none; /* Retirez la bordure actuelle */
+    color: white;
+    padding: 10px; /* Ajustez la marge intérieure pour plus d'espacement */
+    cursor: pointer; /* Changez le curseur au survol pour indiquer l'interactivité */
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.scroll-left-button {
+    margin-right: 10px; /* Ajoutez une marge à droite pour espacer le bouton gauche */
+    left: 0;
+}
+
+.scroll-right-button {
+    margin-left: 10px; /* Ajoutez une marge à gauche pour espacer le bouton droit */
+    right: 0;
+}

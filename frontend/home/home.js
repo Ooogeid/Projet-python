@@ -36,6 +36,19 @@ xhr.onload = function () {
 
 xhr.send();
 
+function scrollLeft() {
+    const container = document.querySelector('.series-container');
+    container.classList.add('animated'); // Ajoutez la classe 'animated'
+    container.scrollLeft -= 800;
+}
+
+function scrollRight() {
+    const container = document.querySelector('.series-container');
+    container.classList.add('animated'); // Ajoutez la classe 'animated'
+    container.scrollLeft += 800;
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
 
     const searchButton = document.getElementById('searchButton');
@@ -140,28 +153,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayResults(results) {
         let html = '';
+    
         if (results.length > 0) {
-                html += '<ul class="ul-result">';
-                results.forEach(function(result) {
-                    html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
-                    html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
-                    html += '</a></li>';
-                });
-                html += '</ul>';
+            results.forEach(function (result) {
+                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
+                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+                html += '</a></li>';
+            });
         } else {
             html += 'Aucun résultat trouvé.';
         }
-        resultDiv.innerHTML = html;
-    }
+    
+        const ulResult = document.querySelector('.ul-result');
+        ulResult.innerHTML = html;
 
-    function getCurrentPage() {
-        const url = new URL(window.location.href);
-        const params = url.searchParams;
-        const currentPage = parseInt(params.get('page'));
-      
-        return currentPage || 1; // Si le paramètre 'page' n'est pas présent dans l'URL, retourne 1 par défaut
-    }
+        const scrollLeftButton = document.querySelector('.scroll-left-button');
+        const scrollRightButton = document.querySelector('.scroll-right-button');
 
+        scrollLeftButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        scrollRightButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+
+        scrollLeftButton.classList.add('scroll-left-button');
+        scrollRightButton.classList.add('scroll-right-button')
+
+        scrollLeftButton.addEventListener('click', scrollLeft);
+        scrollRightButton.addEventListener('click', scrollRight);
+    }
+    
+    
+    
     function getSeriesData(page) {
         const xhr = new XMLHttpRequest();
         const url = '../../backend/controller.php?page=' + page; // Inclure le paramètre de pagination dans l'URL
@@ -179,18 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
         xhr.send();
     }
-
-    // A TRAVAILLER ENCORE (MENU DEROULANT POUR LES SERIES)
-    const nextPageButton = document.getElementById('nextPageButton'); // Supposons que vous avez un bouton avec l'id "nextPageButton"
-    getSeriesData(1); // Par défaut sur 1
-
-    nextPageButton.addEventListener('click', function() {
-    // Récupérer le numéro de page actuel (peut être stocké dans une variable)
-    const currentPage = getCurrentPage(); // Fonction à implémenter qui retourne le numéro de page actuel
-
-    // Calculer le numéro de la page suivante
-    const nextPage = currentPage + 1;
     
-    getSeriesData(nextPage);
-    });
+    getSeriesData();
+
 });
