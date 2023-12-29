@@ -21,7 +21,7 @@ function displayResults(results) {
     const resultDiv = document.getElementById('result');
     let html = '';
     if (results.length > 0) {
-        html += '<ul class="ul-result">';
+        html += '<ul class="ul-result flex-wrap justify-content">';
         results.forEach(function(result) {;
             html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' +
             '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">' +

@@ -360,7 +360,7 @@ h2 {
 }
 
 .series-container ul {
-    display: inline-flex; /* Utilisez flex au lieu de inline-block pour garder les éléments en ligne */
+    display: inline-flex;
     transition: transform 0.5s ease; /* Ajoutez une transition de 0.5 seconde avec une accélération fluide (ease) */
 }
 
@@ -371,8 +371,22 @@ h2 {
     display: flex;
 }
 
+.ul-result.flex-wrap {
+    flex-wrap: wrap;
+  }
+  
+  .ul-result.justify-content {
+    justify-content: center; /* ou toute autre valeur de justification souhaitée */
+  }
+
 .ul-result li {
     margin-right: 10px;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .scroll-left-button,

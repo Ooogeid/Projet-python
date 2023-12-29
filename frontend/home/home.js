@@ -10,19 +10,19 @@ xhr.onload = function () {
             // Une session est active, l'utilisateur est connecté
             document.getElementById('usernameDisplay').textContent = response.username;
 
-            const recommenderXhr = new XMLHttpRequest();
-            recommenderXhr.open('GET', '../../backend/controller.php?recommandation=true', true);
+            // const recommenderXhr = new XMLHttpRequest();
+            // recommenderXhr.open('GET', '../../backend/controller.php?recommandation=true', true);
             
-            recommenderXhr.onload = function () {
-                if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
-                    const recommandations = JSON.parse(recommenderXhr.responseText);
-                    console.log('Recommandations:', recommandations);
-                } else {
-                    console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
-                }
-            };
+            // recommenderXhr.onload = function () {
+            //     if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
+            //         const recommandations = JSON.parse(recommenderXhr.responseText);
+            //         console.log('Recommandations:', recommandations);
+            //     } else {
+            //         console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
+            //     }
+            // };
             
-            recommenderXhr.send();
+            // recommenderXhr.send();
 
         } else {
             // Pas de session active, redirigez vers la page de connexion
@@ -115,32 +115,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function performSearch(event) {
         event.preventDefault();
         const keyword = inputElement.value;
-
+    
         // Annulez la requête précédente si elle est en cours
         if (xhr && xhr.readyState !== 4) {
             xhr.abort();
         }
-
+    
         if (keyword) {
             // Affichez le spinner pendant le chargement
             const spinner = document.querySelector('.loading-spinner');
             spinner.style.display = 'block';
-
+    
             xhr = new XMLHttpRequest();
             xhr.open('POST', '../../backend/controller.php', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
-
+    
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
-                    displayResults(response['series']); 
+                    displayResults(response['series'], true);
                     // Masquez le spinner et réactivez le bouton de recherche
                     spinner.style.display = 'none';
-                    searchButton.disabled = false;
                 }
             };
-            const selectedLanguage = localStorage.getItem("selectedLanguage");
-
+    
+            const selectedLanguage = localStorage.getItem('selectedLanguage');
+    
             const credentials = {
                 keyword: keyword,
                 language: selectedLanguage 
@@ -151,47 +151,61 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function displayResults(results) {
+    function displayResults(results, isSearch) {
+        const resultDiv = document.getElementById('result');
+        const ulResult = resultDiv.querySelector('.ul-result');
+        console.log(results)
         let html = '';
-    
+
         if (results.length > 0) {
-            results.forEach(function (result) {
+            results.forEach(function(result) {
                 html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
                 html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+                html += '<p style="margin-top: 20px;">' + result.titre + '</p>';
                 html += '</a></li>';
             });
         } else {
-            html += 'Aucun résultat trouvé.';
+           const noResult = document.getElementById('noResult');
+           noResult = 'Aucun résultat trouvé.';
+           noResult.style.display = 'flex';
+           noResult.style.justifyContent = 'center';
         }
-    
-        const ulResult = document.querySelector('.ul-result');
+
+        if (isSearch) {
+            resultDiv.classList.remove('series-container'); // Supprimer la classe 'series-container'
+            ulResult.classList.add('container');
+            resultDiv.querySelector('p').style.display = 'none'; // Masquer le paragraphe
+            resultDiv.querySelector('.scroll-left-button').style.display = 'none'; // Afficher le bouton de défilement gauche
+            resultDiv.querySelector('.scroll-right-button').style.display = 'none'; // Afficher le bouton de défilement droit
+        }
+
         ulResult.innerHTML = html;
+        console.log(ulResult);
 
-        const scrollLeftButton = document.querySelector('.scroll-left-button');
-        const scrollRightButton = document.querySelector('.scroll-right-button');
-
+        const scrollLeftButton = resultDiv.querySelector('.scroll-left-button');
+        const scrollRightButton = resultDiv.querySelector('.scroll-right-button');
+      
         scrollLeftButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
         scrollRightButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-
+      
         scrollLeftButton.classList.add('scroll-left-button');
-        scrollRightButton.classList.add('scroll-right-button')
-
+        scrollRightButton.classList.add('scroll-right-button');
+      
         scrollLeftButton.addEventListener('click', scrollLeft);
         scrollRightButton.addEventListener('click', scrollRight);
     }
     
     
-    
-    function getSeriesData(page) {
+    function getSeriesData() {
         const xhr = new XMLHttpRequest();
-        const url = '../../backend/controller.php?page=' + page; // Inclure le paramètre de pagination dans l'URL
+        const url = '../../backend/controller.php?'; // Inclure le paramètre de pagination dans l'URL
     
         xhr.open('GET', url, true);
     
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
-                displayResults(response); // Afficher les résultats en utilisant la fonction displayResults()
+                displayResults(response, false); // Afficher les résultats en utilisant la fonction displayResults()
             } else {
                 console.error('Erreur :', xhr.status, xhr.statusText);
             }
@@ -199,7 +213,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
         xhr.send();
     }
+
     
     getSeriesData();
 
+
 });
+

@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $result = $series;
         }
         else {
-            // Récupération des données de la série pour la page donnée
+            // Récupération des données des séries
             $series = $service->getAllSeries();
             $result = $series;
         }

@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) {
-            console.log(xhr.responseText)
             const response = JSON.parse(xhr.responseText);
             displayResults(response);
         } else {
@@ -39,14 +38,14 @@ function displayResults(results) {
 
     // Générer le HTML trié par catégorie
     sortedCategories.forEach(function (category) {
-    html += '<div class="category-title">' + category + '</div>';
-    html += '<div class="series-container">';
-    seriesByCategory[category].forEach(function (result) {
-    html += '<a href="../serie/serie.html?id=' + result.id + '" class="serie-link">' + result.titre + '</a>';
-        html += '<br>';
-    });
-    html += '</div>';
-    });
+        html += '<div class="category-title">' + category + '</div>';
+        html += '<div>';
+        seriesByCategory[category].forEach(function (result) {
+            html += '<a href="../serie/serie.html?id=' + result.id + '" class="serie-link">' + result.titre + '</a>';
+                html += '<br>';
+            });
+            html += '</div>';
+        });
     } else {
         html += 'Aucun résultat trouvé.';
     }
