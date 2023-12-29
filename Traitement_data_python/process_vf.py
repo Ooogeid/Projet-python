@@ -2,10 +2,14 @@ import spacy
 import pandas as pd
 import os
 import numpy as np
+import json
+
+with open(r"C:\wamp64\www\Projet_sae\src\Traitement_data_python\stop_words_french.json", "r", encoding="utf-8") as file:
+    stop_words = json.load(file)
 
 # Charger le modèle SpaCy
-nlp = spacy.load("en_core_web_sm")
-pos_a_exclure = ['SYM', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'ADJ', 'AUX', 'ADV', 'PRT', 'SPACE']
+nlp = spacy.load("fr_core_news_sm")
+pos_a_exclure = ['SYM', 'NUM', 'PRON', 'DET', 'CONJ', 'ADP', 'AUX', 'ADV', 'PRT', 'SPACE']
 
 # Fonction pour nettoyer et lemmatiser les mots
 def clean_word(word):
@@ -16,33 +20,46 @@ def clean_word(word):
 
         for token in doc:
             if not token.is_stop and token.is_alpha and not token.is_punct and not token.is_space:
-                if token.pos_ not in pos_a_exclure:
+                if token.pos_ not in pos_a_exclure and token.lemma_ not in stop_words:
                     cleaned_word.append(token.lemma_)
 
         return " ".join(cleaned_word)
     else:
         return ""
 
-# Fonction pour calculer le TF-IDF manuellement et remplacer la colonne 'Occurrence'
+
+
 def calculate_replace_tfidf(data):
     # Calcule TF-IDF values manuellement
     total_documents = len(data)
-    term_frequency = data['Occurrence']
-    document_frequency = data.groupby('Mot_nettoye')['Mot'].nunique()  # Utiliser nunique() pour compter le nombre de documents
 
-    # Calculer IDF (inverse document frequency)
-    inverse_document_frequency = np.log(total_documents / (1 + document_frequency))
+    # Nouvelle DataFrame pour stocker les données traitées
+    processed_data = pd.DataFrame(columns=['Mot_nettoye', 'TF-IDF'])
 
-    # Créer un dictionnaire pour stocker l'IDF de chaque mot
-    idf_dict = dict(zip(document_frequency.index, inverse_document_frequency))
+    # Parcourir chaque mot unique dans le DataFrame original
+    for mot_nettoye, group in data.groupby('Mot_nettoye', as_index=False):  # Utilise as_index=False pour éviter le problème d'attribut
+        # Si le mot a des doublons, on les fusionne et on fait la somme des occurrences
+        if len(group) > 1:
+            merged_group = group.groupby('Mot_nettoye', as_index=False).agg({'Occurrence': 'sum'})  # Utilise as_index=False ici aussi
+        else:
+            merged_group = group.copy()
 
-    # Appliquer l'IDF à chaque ligne du DataFrame
-    data['TF-IDF'] = term_frequency * data['Mot_nettoye'].map(idf_dict)
+        # Calculer la fréquence du terme (TF)
+        term_frequency = merged_group['Occurrence'].sum()
 
-    # Supprimer la colonne 'Occurrence'
-    data = data.drop(columns=['Occurrence'])
+        # Calculer l'inverse de la fréquence du document (IDF) pour chaque mot distinct
+        document_frequency = len(merged_group)
+        inverse_document_frequency = np.log(total_documents / (1 + document_frequency))
 
-    return data
+        # Calculer le TF-IDF
+        merged_group['TF-IDF'] = term_frequency * inverse_document_frequency
+
+        # Ajouter les données traitées à la DataFrame finale
+        processed_data = pd.concat([processed_data, merged_group[['Mot_nettoye', 'TF-IDF']]], ignore_index=True, sort=False)
+
+    return processed_data
+
+
 
 # Fonction pour traiter un fichier CSV avec TF-IDF
 def clean_with_tfidf(input_csv_path, output_csv_path):
@@ -79,7 +96,7 @@ def clean_with_tfidf(input_csv_path, output_csv_path):
 def process_series(series_directory, output_directory):
     # Parcourir tous les fichiers du répertoire de la série
     for filename in os.listdir(series_directory):
-        # Vérifier si le fichier est un fichier CSV contenant "_vo" dans son nom
+        # Vérifier si le fichier est un fichier CSV contenant "_vf" dans son nom
         if filename.endswith('.csv') and '_vf' in filename:
             # Construire le chemin d'accès complet du fichier d'entrée
             input_csv_path = os.path.join(series_directory, filename)

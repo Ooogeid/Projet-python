@@ -11,3 +11,10 @@ Le résultat est un fichier CSV contenant les mots nettoyés, lemmatisés, ainsi
 
 5. process_vf // pareil mais en français
 
+6. insertion-data.py // script permettant d'insérer les données clean en base
+
+7. insertion-description 
+
+8. insertion-categorie
+
+9.
