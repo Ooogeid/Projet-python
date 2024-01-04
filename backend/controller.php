@@ -56,7 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         } 
         elseif (isset($_GET['recommandation'])) {
-            $recommendedSeries = $service->recommandation();
+            $userId = $_SESSION['id_users'];
+            $recommendedSeries = $service->recommandation($userId);
             $result['recommandation'] = $recommendedSeries;
         }
         elseif (isset($_GET['maListe'])) {  // Récupération de la liste des séries de l'utilisateur

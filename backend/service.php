@@ -299,43 +299,131 @@ class SeriesService {
         return $series;
     }
 
-    public function getSerieKeywords($serieId){
-        $sql = "
-            SELECT mv.Libelle AS keyword, av.poids AS weight
-            FROM serie s
-            JOIN apparition_vo av ON s.id_serie = av.id_serie
-            JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
-            JOIN likes l ON s.id_serie = l.id_serie
-            WHERE l.id_users = :user_id
-            AND s.id_serie = :serie_id
-            GROUP BY mv.Libelle
-            ORDER BY weight DESC
-            LIMIT 40";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
-        $stmt->bindParam(':serie_id', $serieId, PDO::PARAM_INT);
-        $stmt->execute();
-        $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
-        
-        return $keywords;
-    }
-
-    public function recommandation() {
+    public function recommandation($userId) {
         $series = $this->getMaliste();
     
+        // Récupérer tous les mots-clés et leurs poids pour les séries en liste
+        $sql = "
+            SELECT s.id_serie, m.Libelle AS mot_cle, a.poids AS poids
+            FROM serie s
+            JOIN apparition_vo a ON s.id_serie = a.id_serie
+            JOIN mots_vo m ON a.id_mot_vo = m.id_mot_vo
+            WHERE s.id_serie IN (".implode(',', array_column($series, 'id')).")
+            LIMIT 20";
+    
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+    
         $seriesKeywords = [];
-        $seriesWeights = [];
-
-        foreach ($series as $serie) {
-            $serieId = $serie['id'];
-            $seriesKeywords[$serieId] = $this->getSerieKeywords($serieId);
+        $allKeywords = [];
+    
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $serieId = $row['id_serie'];
+            $keyword = $row['mot_cle'];
+            $weight = $row['poids'];
+    
+            $seriesKeywords[$serieId][] = $keyword;
+    
+            if (isset($allKeywords[$keyword])) {
+                $allKeywords[$keyword] += $weight;
+            } else {
+                $allKeywords[$keyword] = $weight;
+            }
         }
 
-        var_dump($seriesKeywords);
+        // Construire les marqueurs de paramètres pour les mots-clés
+        $keywordPlaceholders = implode(',', array_fill(0, count($allKeywords), '?'));
 
-    }
+        // Requête pour récupérer le nombre de séries associé à un mot-clé"
+        $sql = "
+            SELECT mots_vo.Libelle AS mot_cle, COUNT(DISTINCT apparition_vo.id_serie) AS count
+            FROM apparition_vo
+            LEFT JOIN mots_vo ON apparition_vo.id_mot_vo = mots_vo.id_mot_vo
+            WHERE mots_vo.Libelle IN ($keywordPlaceholders)
+            GROUP BY mots_vo.Libelle";
+
+        $stmt = $this->db->prepare($sql);
+
+        // Lier les valeurs des mots-clés aux paramètres de la requête
+        $stmt->execute(array_keys($allKeywords));
+        $keywordCounts = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $keyword = $row['mot_cle'];
+            $count = $row['count'];
+            $keywordCounts[$keyword] = $count;
+        }
+
+        $excludedKeywords = [];
+
+        foreach ($allKeywords as $keyword => $weight) {
+            $count = $keywordCounts[$keyword];
+            // Vérifier si le mot-clé est présent dans toutes les séries
+            if ($count >= 120) {
+                $excludedKeywords[] = $keyword;
+            }
+        }
+
+        // Filtrer les mots-clés exclus de la liste des mots-clés pertinents
+        $relevantKeywords = array_diff_key($allKeywords, array_flip($excludedKeywords));
     
+        $selectedKeywords = array_slice(array_keys($relevantKeywords), 0, 200); // on limite à 200 mots-clés dans le cas où il y a beaucoup de séries en liste
+        var_dump($selectedKeywords);
+
+        // Création d'un tableau de paramètres pour les mots-clés
+        $keywordParams = array();
+        foreach ($selectedKeywords as $index => $keyword) {
+            $param = ':keyword' . $index;
+            $keywordParams[] = $param;
+        }
+
+        // Requête SQL pour récupérer les séries en commun basées sur les mots-clés
+        $sql = "
+            SELECT s.id_serie, s.titre AS titre, SUM(a.poids) AS score
+            FROM serie s
+            JOIN apparition_vo a ON s.id_serie = a.id_serie
+            JOIN mots_vo m ON a.id_mot_vo = m.id_mot_vo
+            LEFT JOIN likes l ON s.id_serie = l.id_serie AND l.id_users = :userId
+            WHERE m.Libelle IN (".implode(',', $keywordParams).")
+            AND l.id_serie IS NULL
+            GROUP BY s.id_serie, titre
+            ORDER BY score DESC
+            LIMIT 20";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        
+        foreach ($selectedKeywords as $index => $keyword) {
+            $param = ':keyword' . $index;
+            $stmt->bindParam($param, $keyword);
+        }
+        
+        $stmt->execute();
+        
+        $seriesScores = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $serieId = $row['id_serie'];
+            $score = $row['score'];
+
+            if (isset($seriesScores[$serieId])) {
+                $seriesScores[$serieId] += $score;
+            } else {
+                $seriesScores[$serieId] = $score;
+            }
+        }
+        
+        arsort($seriesScores);
+    
+        $topSeries = array_slice($seriesScores, 0, 20, true);
+    
+        $recommendedSeries = [];
+        foreach ($topSeries as $serieId => $score) {
+            $serieInfo = $this->getSerieData($serieId);
+            $serieInfo['score'] = $score;
+            $recommendedSeries[] = $serieInfo;
+        }
+    
+        return $recommendedSeries;
+    }
 
 
 }

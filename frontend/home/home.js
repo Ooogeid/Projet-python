@@ -10,19 +10,19 @@ xhr.onload = function () {
             // Une session est active, l'utilisateur est connecté
             document.getElementById('usernameDisplay').textContent = response.username;
 
-            // const recommenderXhr = new XMLHttpRequest();
-            // recommenderXhr.open('GET', '../../backend/controller.php?recommandation=true', true);
+            const recommenderXhr = new XMLHttpRequest();
+            recommenderXhr.open('GET', '../../backend/controller.php?recommandation=true', true);
             
-            // recommenderXhr.onload = function () {
-            //     if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
-            //         const recommandations = JSON.parse(recommenderXhr.responseText);
-            //         console.log('Recommandations:', recommandations);
-            //     } else {
-            //         console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
-            //     }
-            // };
+            recommenderXhr.onload = function () {
+                if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
+                    const recommandations = JSON.parse(recommenderXhr.responseText);
+                    console.log('Recommandations:', recommandations);
+                } else {
+                    console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
+                }
+            };
             
-            // recommenderXhr.send();
+            recommenderXhr.send();
 
         } else {
             // Pas de session active, redirigez vers la page de connexion
@@ -154,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayResults(results, isSearch) {
         const resultDiv = document.getElementById('result');
         const ulResult = resultDiv.querySelector('.ul-result');
-        console.log(results)
         let html = '';
 
         if (results.length > 0) {
@@ -180,7 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         ulResult.innerHTML = html;
-        console.log(ulResult);
 
         const scrollLeftButton = resultDiv.querySelector('.scroll-left-button');
         const scrollRightButton = resultDiv.querySelector('.scroll-right-button');
