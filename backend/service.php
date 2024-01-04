@@ -301,7 +301,8 @@ class SeriesService {
 
     public function recommandation($userId) {
         $series = $this->getMaliste();
-    
+        $limit = count($series) * 20; // on limite à 20 fois le nombre de séries en liste
+
         // Récupérer tous les mots-clés et leurs poids pour les séries en liste
         $sql = "
             SELECT s.id_serie, m.Libelle AS mot_cle, a.poids AS poids
@@ -309,7 +310,7 @@ class SeriesService {
             JOIN apparition_vo a ON s.id_serie = a.id_serie
             JOIN mots_vo m ON a.id_mot_vo = m.id_mot_vo
             WHERE s.id_serie IN (".implode(',', array_column($series, 'id')).")
-            LIMIT 20";
+            LIMIT " .$limit;
     
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -365,7 +366,7 @@ class SeriesService {
 
         // Filtrer les mots-clés exclus de la liste des mots-clés pertinents
         $relevantKeywords = array_diff_key($allKeywords, array_flip($excludedKeywords));
-    
+
         $selectedKeywords = array_slice(array_keys($relevantKeywords), 0, 200); // on limite à 200 mots-clés dans le cas où il y a beaucoup de séries en liste
         var_dump($selectedKeywords);
 
@@ -394,7 +395,7 @@ class SeriesService {
         
         foreach ($selectedKeywords as $index => $keyword) {
             $param = ':keyword' . $index;
-            $stmt->bindParam($param, $keyword);
+            $stmt->bindValue($param, $keyword, PDO::PARAM_STR);
         }
         
         $stmt->execute();
