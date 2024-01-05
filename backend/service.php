@@ -219,7 +219,7 @@ class SeriesService {
     // Fonction pour récup les infos d'une série lorsque l'utilisateur clique sur une série en particulière
     public function getSerieData($serieId) {
         
-        $sql = "SELECT titre, description FROM serie WHERE id_serie = :id";
+        $sql = "SELECT id_serie as id, titre, description FROM serie WHERE id_serie = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
         $stmt->execute();
@@ -368,7 +368,6 @@ class SeriesService {
         $relevantKeywords = array_diff_key($allKeywords, array_flip($excludedKeywords));
 
         $selectedKeywords = array_slice(array_keys($relevantKeywords), 0, 200); // on limite à 200 mots-clés dans le cas où il y a beaucoup de séries en liste
-        var_dump($selectedKeywords);
 
         // Création d'un tableau de paramètres pour les mots-clés
         $keywordParams = array();

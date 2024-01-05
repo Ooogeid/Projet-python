@@ -16,7 +16,7 @@ xhr.onload = function () {
             recommenderXhr.onload = function () {
                 if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
                     const recommandations = JSON.parse(recommenderXhr.responseText);
-                    console.log('Recommandations:', recommandations);
+                    displayRecommandations(recommandations);
                 } else {
                     console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
                 }
@@ -37,21 +37,42 @@ xhr.onload = function () {
 xhr.send();
 
 function scrollLeft() {
-    const container = document.querySelector('.series-container');
-    container.classList.add('animated'); // Ajoutez la classe 'animated'
-    container.scrollLeft -= 800;
+    const resultContainer = document.querySelector('#result .series-container');
+    resultContainer.classList.add('animated');
+    resultContainer.scrollLeft -= 800;
 }
 
 function scrollRight() {
-    const container = document.querySelector('.series-container');
-    container.classList.add('animated'); // Ajoutez la classe 'animated'
-    container.scrollLeft += 800;
+    const resultContainer = document.querySelector('#result .series-container');
+    resultContainer.classList.add('animated');
+    resultContainer.scrollLeft += 800;
 }
 
+function scrollLeftRecommandations() {
+    const recommandationsContainer = document.querySelector('#recommandations .series-container');
+    recommandationsContainer.classList.add('animated');
+    recommandationsContainer.scrollLeft -= 800;
+}
+
+function scrollRightRecommandations() {
+    const recommandationsContainer = document.querySelector('#recommandations .series-container');
+    recommandationsContainer.classList.add('animated');
+    recommandationsContainer.scrollLeft += 800;
+}
+
+document.onreadystatechange = function () {
+    const spinner = document.getElementById('loading-spinner');
+    if (document.readyState === 'loading') {
+        // Le DOM n'est pas encore entièrement chargé, afficher le spinner
+        spinner.style.display = 'block';
+    } else if (document.readyState === 'interactive') {
+        // Le DOM est partiellement chargé, masquer le spinner
+        spinner.style.display = 'none';
+    }
+};
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    const searchButton = document.getElementById('searchButton');
     const inputElement = document.getElementById('credentials');
     const resultDiv = document.getElementById('result');
     const languageToggle = document.getElementById('languageToggle');
@@ -155,33 +176,33 @@ document.addEventListener('DOMContentLoaded', function() {
         const resultDiv = document.getElementById('result');
         const ulResult = resultDiv.querySelector('.ul-result');
         let html = '';
-
+      
         if (results.length > 0) {
-            results.forEach(function(result) {
-                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
-                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
-                html += '<p style="margin-top: 20px;">' + result.titre + '</p>';
-                html += '</a></li>';
-            });
+          results.forEach(function(result) {
+            html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
+            html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+            html += '<p style="margin-top: 20px;">' + result.titre + '</p>';
+            html += '</a></li>';
+        });
         } else {
-           const noResult = document.getElementById('noResult');
-           noResult = 'Aucun résultat trouvé.';
-           noResult.style.display = 'flex';
-           noResult.style.justifyContent = 'center';
+            const noResult = document.getElementById('noResult');
+            noResult.textContent = 'Aucun résultat trouvé.'; // Modifier le texte du paragraphe
+            noResult.style.display = 'flex';
+            noResult.style.justifyContent = 'center';
         }
-
+      
         if (isSearch) {
-            resultDiv.classList.remove('series-container'); // Supprimer la classe 'series-container'
-            ulResult.classList.add('container');
-            resultDiv.querySelector('p').style.display = 'none'; // Masquer le paragraphe
-            resultDiv.querySelector('.scroll-left-button').style.display = 'none'; // Afficher le bouton de défilement gauche
-            resultDiv.querySelector('.scroll-right-button').style.display = 'none'; // Afficher le bouton de défilement droit
+          resultDiv.classList.remove('series-container');
+          ulResult.classList.add('container');
+          resultDiv.querySelector('p').style.display = 'none';
+          resultDiv.querySelector('.scroll-left-button').style.display = 'none';
+          resultDiv.querySelector('.scroll-right-button').style.display = 'none';
         }
-
+      
         ulResult.innerHTML = html;
-
-        const scrollLeftButton = resultDiv.querySelector('.scroll-left-button');
-        const scrollRightButton = resultDiv.querySelector('.scroll-right-button');
+      
+        const scrollLeftButton = resultDiv.querySelector('.scroll-left-button-results');
+        const scrollRightButton = resultDiv.querySelector('.scroll-right-button-results');
       
         scrollLeftButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
         scrollRightButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
@@ -192,7 +213,6 @@ document.addEventListener('DOMContentLoaded', function() {
         scrollLeftButton.addEventListener('click', scrollLeft);
         scrollRightButton.addEventListener('click', scrollRight);
     }
-    
     
     function getSeriesData() {
         const xhr = new XMLHttpRequest();
@@ -218,3 +238,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+function displayRecommandations(recommandations) {
+    const recommandationsDiv = document.getElementById('recommandations');
+    const ulResult = recommandationsDiv.querySelector('.ul-result');
+
+    let recommandationsHTML = '';
+    const recommandationsArray = Object.values(recommandations);
+    recommandationsArray.forEach(function(recommandationArray) {
+        recommandationArray.forEach(function(recommandation) {
+            recommandationsHTML += '<li><a href="../serie/serie.html?id=' + recommandation.id + '" class="lien-serie">';
+            recommandationsHTML += '<img src="../img/img_series/' + recommandation.id + '.jpg" alt="' + recommandation.titre + '" class="img-series">';
+            recommandationsHTML += '<p style="margin-top: 20px;">' + recommandation.titre + '</p>';
+            recommandationsHTML += '</a></li>';
+        });
+    });
+
+    ulResult.innerHTML = recommandationsHTML;
+
+    const scrollLeftButton = recommandationsDiv.querySelector('.scroll-left-button-recommandations');
+    const scrollRightButton = recommandationsDiv.querySelector('.scroll-right-button-recommandations');
+
+    scrollLeftButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    scrollRightButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+
+    scrollLeftButton.classList.add('scroll-left-button');
+    scrollRightButton.classList.add('scroll-right-button');
+
+    scrollLeftButton.addEventListener('click', scrollLeftRecommandations);
+    scrollRightButton.addEventListener('click', scrollRightRecommandations);
+}
