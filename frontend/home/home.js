@@ -72,29 +72,45 @@ document.onreadystatechange = function () {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-
     const inputElement = document.getElementById('credentials');
     const resultDiv = document.getElementById('result');
     const languageToggle = document.getElementById('languageToggle');
-
+    var selectedLanguage = localStorage.getItem('selectedLanguage');
+  
+    // Restaurer la langue sélectionnée
+    if (selectedLanguage === 'en') {
+        languageToggle.checked = true;
+    } else {
+        languageToggle.checked = false;
+    }
+  
     let xhr = null;
-
+  
     searchIcon.addEventListener('click', function(event) {
         performSearch(event);
     });
-
+  
     inputElement.addEventListener('keyup', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault(); // Empêche le comportement par défaut du formulaire
             performSearch(event);
         }
     });
-
+  
     languageToggle.addEventListener('change', function() {
         if (languageToggle.checked) {
             saveLanguageSelection('en');
         } else {
             saveLanguageSelection('fr'); // Par défaut la recherche est en français
+        }
+    });
+
+    // Réinitialiser la langue à "français" lors du retour sur la page d'accueil
+    window.addEventListener('pageshow', function(event) {
+        if (localStorage.getItem('selectedLanguage') !== 'fr') {
+            saveLanguageSelection('fr'); // Réinitialiser la langue à "français"
+            languageToggle.checked = false; // Décocher le bouton de bascule
+            console.log('Langue sélectionnée :', localStorage.getItem('selectedLanguage'));
         }
     });
 
@@ -192,11 +208,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       
         if (isSearch) {
-          resultDiv.classList.remove('series-container');
-          ulResult.classList.add('container');
-          resultDiv.querySelector('p').style.display = 'none';
-          resultDiv.querySelector('.scroll-left-button').style.display = 'none';
-          resultDiv.querySelector('.scroll-right-button').style.display = 'none';
+            resultDiv.classList.remove('series-container');
+            ulResult.classList.add('container');
+            resultDiv.querySelector('p').style.display = 'none';
+            resultDiv.querySelector('.scroll-left-button').style.display = 'none';
+            resultDiv.querySelector('.scroll-right-button').style.display = 'none';
         }
       
         ulResult.innerHTML = html;

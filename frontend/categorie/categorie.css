@@ -1,25 +1,19 @@
 .category-title {
     font-size: 24px;
-    font-weight: bold;
-    padding: 20px;
-    margin-bottom: 10px;
+    font-style: italic;
+    padding: 10px;
 }
   
-.series-container { 
-    margin-bottom: 20px;
+.series-categorie-container { 
+    display: block;
+    margin-bottom: 10px;
 }
 
 .serie-link {
-    transition: color 0.2s;
+    transition: color 0.1s;
+    color: #2ef8ff; /* Couleur de lien claire */
 }
 
 .serie-link:hover {
-    background-color: #ccc;
-    text-decoration: none;
-}
-
-.category-container {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
+    color: #0056b3; /* Couleur de lien au survol */
 }

@@ -18,37 +18,38 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function displayResults(results) {
-    const resultDiv = document.getElementById('result');
+    const resultDiv = document.getElementById('result-categorie');
     let html = '';
-  
+
     const seriesByCategory = {};
-  
+
     if (results.length > 0) {
         // Parcourir les résultats et stocker les séries par catégorie
         results.forEach(function (result) {
-        const category = result.nom;
-        if (!seriesByCategory[category]) {
-            seriesByCategory[category] = [];
-        }
-        seriesByCategory[category].push(result);
-    });
-  
-    // Trier les catégories dans l'ordre alphabétique
-    const sortedCategories = Object.keys(seriesByCategory).sort();
+            const category = result.nom;
+            if (!seriesByCategory[category]) {
+                seriesByCategory[category] = [];
+            }
+            seriesByCategory[category].push(result);
+        });
 
-    // Générer le HTML trié par catégorie
-    sortedCategories.forEach(function (category) {
-        html += '<div class="category-title">' + category + '</div>';
-        html += '<div>';
-        seriesByCategory[category].forEach(function (result) {
-            html += '<a href="../serie/serie.html?id=' + result.id + '" class="serie-link">' + result.titre + '</a>';
+        // Trier les catégories dans l'ordre alphabétique
+        const sortedCategories = Object.keys(seriesByCategory).sort();
+
+        // Générer le HTML trié par catégorie
+        sortedCategories.forEach(function (category) {
+            html += '<div class="category-container">'; // Ajout de la classe category-container
+            html += '<div class="category-title">' + category + '</div>';
+            html += '<div class="series-categorie-container">'; // Ajout de la classe series-container
+            seriesByCategory[category].forEach(function (result) {
+                html += '<a href="../serie/serie.html?id=' + result.id + '" class="serie-link">' + result.titre + '</a>';
                 html += '<br>';
             });
-            html += '</div>';
+            html += '</div></div>'; 
         });
     } else {
         html += 'Aucun résultat trouvé.';
     }
-  
+
     resultDiv.innerHTML = html;
 }
