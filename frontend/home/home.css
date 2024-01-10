@@ -351,10 +351,11 @@ h2 {
     height: 250px;
     border-radius: 15px;
     transition: box-shadow 0.1s ease;
+    border: 2px solid #d7f4ff36;
 }
 
 .img-series:hover {
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   }
 
 .class-css{
