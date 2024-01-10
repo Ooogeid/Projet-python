@@ -304,6 +304,12 @@ p{
     color: #d7f4ff;
 }
 
+#recommandations {
+    padding: 20px;
+    font-size: 18px;
+    color: #d7f4ff;
+}
+
 /* Style pour les résultats de recherche */
 h2 {
     font-size: 24px;
@@ -343,7 +349,13 @@ h2 {
 .img-series{
     width: 200px;  
     height: 250px;
+    border-radius: 15px;
+    transition: box-shadow 0.1s ease;
 }
+
+.img-series:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
 
 .class-css{
     border-radius: 10px;

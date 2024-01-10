@@ -192,16 +192,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const resultDiv = document.getElementById('result');
         const ulResult = resultDiv.querySelector('.ul-result');
         let html = '';
-      
+        const noResult = document.getElementById('noResult');
+        noResult.textContent = ''; // Effacer le contenu du paragraphe
+        noResult.style.display = 'none'; // Masquer le message
+
         if (results.length > 0) {
-          results.forEach(function(result) {
-            html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
-            html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
-            html += '<p style="margin-top: 20px;">' + result.titre + '</p>';
-            html += '</a></li>';
-        });
+            results.forEach(function(result) {
+                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
+                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+                html += '<p style="margin-top: 20px;">' + result.titre + '</p>';
+                html += '</a></li>';
+            });
+            noResult.style.display = 'none';
         } else {
-            const noResult = document.getElementById('noResult');
             noResult.textContent = 'Aucun résultat trouvé.'; // Modifier le texte du paragraphe
             noResult.style.display = 'flex';
             noResult.style.justifyContent = 'center';
