@@ -36,7 +36,6 @@ class SeriesService {
     
         // Lemmatisation des mots-clés
         $keywordsLemma = array_map([$this, 'lemmatize'], $keywordsArrayMinuscule);
-
         // Recherche de séries dont le titre correspond au mot-clé (on ne lemmatise pas celui-ci)
         $titleMatches = $this->searchSeriesByTitle($keywordsArrayMinuscule);
 
@@ -100,7 +99,7 @@ class SeriesService {
         $keywordsToSearch = array_diff($processedKeywords['keywordsLemma'], array_column($processedKeywords['titleMatches'], 'titre'));
     
         // Pour chaque mot-clé restant, on recherche les séries correspondantes
-        foreach ($processedKeywords['keywordsArrayMinuscule'] as $keyword) {
+        foreach ($keywordsToSearch as $keyword) {
 
             // On détecte la langue du mot-clé
             $language = $credentials['language'];
@@ -108,21 +107,18 @@ class SeriesService {
             // Langue française ou anglaise
             $table = ($language == 'fr') ? 'vf' : 'vo';
             $query = "
-                SELECT s.id_serie as id, s.titre, av.poids AS poids
-                FROM serie s
-                JOIN apparition_$table av ON s.id_serie = av.id_serie
-                WHERE 1
-                AND av.id_mot_$table = 
-                (SELECT mv.id_mot_$table 
-                FROM mots_$table mv
-                WHERE mv.Libelle LIKE :keyword LIMIT 1) 
-                ORDER BY poids DESC
-                LIMIT 20";
+            SELECT s.id_serie as id, s.titre, av.poids AS poids
+            FROM serie s
+            JOIN apparition_$table av ON s.id_serie = av.id_serie
+            JOIN mots_$table mv ON av.id_mot_$table = mv.id_mot_$table
+            WHERE mv.Libelle LIKE CONCAT('%', :keyword, '%')
+            ORDER BY poids DESC
+            LIMIT 20";  
     
             $stmt = $this->db->prepare($query);
             $stmt->bindParam(':keyword', $keyword, PDO::PARAM_STR);
             $stmt->execute();
-    
+
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             foreach ($result as $seriesResult) {
                 $seriesTitle = $seriesResult['titre'];
