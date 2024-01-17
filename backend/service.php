@@ -220,7 +220,7 @@ class SeriesService {
         $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
         $stmt->execute();
         $serieData = $stmt->fetch(PDO::FETCH_ASSOC);
-        utf8_encode($serieData['description']);
+        // utf8_encode($serieData['description']);
         return $serieData;
     }
     
@@ -282,12 +282,12 @@ class SeriesService {
         $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
         $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($series as &$serie) {
-            $serie['description'] = utf8_encode($serie['description']);
-        }
+        // foreach ($series as &$serie) {
+        //     $serie['description'] = utf8_encode($serie['description']);
+        // }
         return $series;
     }
-
+    
     public function getSeriesByCategories(){
         $query = "SELECT s.id_serie as id, s.titre, c.nom as nom
         FROM serie s
@@ -296,9 +296,9 @@ class SeriesService {
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($series as &$serie) {
-            $serie['nom'] = utf8_encode($serie['nom']);
-        }
+        // foreach ($series as &$serie) {
+        //     $serie['nom'] = utf8_encode($serie['nom']);
+        // }
         return $series;
     }
 
@@ -424,9 +424,9 @@ class SeriesService {
             $serieInfo['score'] = $score;
             $recommendedSeries[] = $serieInfo;
         }
-        foreach ($recommendedSeries as &$serie) {
-            $serie['description'] = utf8_encode($serie['description']);
-        }
+        // foreach ($recommendedSeries as &$serie) {
+        //     $serie['description'] = utf8_encode($serie['description']);
+        // }
         return $recommendedSeries;
     }
 
