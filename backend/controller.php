@@ -15,8 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Gestion de la recherche de mots clés
         if (isset($credentials['keyword'])) {
             $result['series'] = $service->findSeries($credentials);
-            $recommendedSeries = $service->recommandation();
-            $result['recommandation'] = $recommendedSeries;
         }
         // Gestion de l'ajout de like 
         elseif (isset($credentials['like'])) {
@@ -50,13 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             // récupération des données de la série pour le détail
             $serieData = $service->getSerieData($serieId);
             if ($serieData) {
-                $result['description'] = utf8_encode($serieData['description']);
+                $result['description'] = $serieData['description'];
                 $result['titre'] = utf8_encode($serieData['titre']);
             } else {
                 $result = ['error' => 'Série non trouvée'];
                 http_response_code(404);
             }
         } 
+        elseif (isset($_GET['recommandation'])) {
+            $userId = $_SESSION['id_users'];
+            $recommendedSeries = $service->recommandation($userId);
+            $result['recommandation'] = $recommendedSeries;
+        }
         elseif (isset($_GET['maListe'])) {  // Récupération de la liste des séries de l'utilisateur
             $series = $service->getMaliste();
             $result = $series;
@@ -66,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $result = $series;
         }
         else {
-            // récupération des données de la série pour le détail
+            // Récupération des données des séries
             $series = $service->getAllSeries();
             $result = $series;
         }
