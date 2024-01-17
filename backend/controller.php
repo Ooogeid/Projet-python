@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             // récupération des données de la série pour le détail
             $serieData = $service->getSerieData($serieId);
             if ($serieData) {
-                $result['description'] = $serieData['description'];
-                $result['titre'] = utf8_encode($serieData['titre']);
+                $result['description'] = utf8_encode($serieData['description']);
+                $result['titre'] = $serieData['titre'];
             } else {
                 $result = ['error' => 'Série non trouvée'];
                 http_response_code(404);
@@ -73,7 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $series = $service->getAllSeries();
             $result = $series;
         }
-        
         header('Content-Type: application/json');
         echo json_encode($result);
     } catch (PDOException $e) {
