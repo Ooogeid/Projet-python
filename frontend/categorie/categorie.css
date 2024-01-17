@@ -1,13 +1,14 @@
+.ctr-main {
+    margin-left: 20px; /* Vous pouvez ajuster cette valeur selon vos préférences */
+    text-align: left;  /* Pour aligner le texte à gauche à l'intérieur du conteneur */
+}
+
 .category-title {
     font-size: 24px;
     font-weight: bold;
     padding: 20px;
     margin-bottom: 10px;
 }
-  
-/* .series-container { 
-    margin-bottom: 20px;
-} */
 
 .serie-link {
     transition: color 0.2s;
@@ -17,9 +18,3 @@
     background-color: #ccc;
     text-decoration: none;
 }
-
-/* .category-container {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 10px;
-} */
