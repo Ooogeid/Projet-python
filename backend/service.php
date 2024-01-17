@@ -220,7 +220,7 @@ class SeriesService {
         $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
         $stmt->execute();
         $serieData = $stmt->fetch(PDO::FETCH_ASSOC);
-        // utf8_encode($serieData['description']);
+        //utf8_encode($serieData['description']);
         return $serieData;
     }
     
@@ -282,12 +282,12 @@ class SeriesService {
         $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
         $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // foreach ($series as &$serie) {
-        //     $serie['description'] = utf8_encode($serie['description']);
-        // }
+        //foreach ($series as &$serie) {
+        //    $serie['description'] = utf8_encode($serie['description']);
+        //}
         return $series;
     }
-    
+
     public function getSeriesByCategories(){
         $query = "SELECT s.id_serie as id, s.titre, c.nom as nom
         FROM serie s
@@ -296,9 +296,9 @@ class SeriesService {
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // foreach ($series as &$serie) {
-        //     $serie['nom'] = utf8_encode($serie['nom']);
-        // }
+        //foreach ($series as &$serie) {
+        //    $serie['nom'] = utf8_encode($serie['nom']);
+        //}
         return $series;
     }
 
@@ -406,33 +406,14 @@ class SeriesService {
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $serieId = $row['id_serie'];
             $score = $row['score'];
-<<<<< HEAD
-    public function recommandation(){
-        // Récupérer les mots clés des séries likées par l'utilisateur
-        $keywords = $this->getMalisteKeywords();
-        // Requête de recherche pour les séries recommandées
-        $query = "
-            SELECT s.id_serie AS id, s.titre, av.poids AS poids
-            FROM serie s
-            JOIN apparition_vo av ON s.id_serie = av.id_serie
-            JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
-            LEFT JOIN (
-                SELECT id_serie
-                FROM likes
-                WHERE id_users = :user_id
-            ) l ON s.id_serie = l.id_serie
-            WHERE mv.Libelle IN ('" . implode("','", $keywords) . "')
-            AND l.id_serie IS NULL
-            ORDER BY poids DESC
-            LIMIT 10";
-=======
+
+            
             if (isset($seriesScores[$serieId])) {
                 $seriesScores[$serieId] += $score;
             } else {
                 $seriesScores[$serieId] = $score;
             }
         }
->>>>>>> main
         
         arsort($seriesScores);
     
@@ -444,12 +425,11 @@ class SeriesService {
             $serieInfo['score'] = $score;
             $recommendedSeries[] = $serieInfo;
         }
-        // foreach ($recommendedSeries as &$serie) {
-        //     $serie['description'] = utf8_encode($serie['description']);
-        // }
+        //foreach ($recommendedSeries as &$serie) {
+        //    $serie['description'] = utf8_encode($serie['description']);
+        //}
         return $recommendedSeries;
     }
-
 
 }
 ?>
