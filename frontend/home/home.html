@@ -34,7 +34,6 @@
                         <img src="../img/profile.png">
                         <ul class="dropdown">
                             <li><a href="../login/login.html" id="logoutLink">Se déconnecter</a></li>
-                            <li><a href="#">Changer d'utilisateur   </a></li>
                         </ul>
                     </div>
                 </li>
@@ -42,13 +41,34 @@
         </nav>
     </header>
 
+    <div id="loading-spinner" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i>
+    </div>
+
     <div class="ctr-main">
         <h1>Bienvenue sur RétroFlix, toutes vos séries des années 2000 !</h1>
         <div class="loading-spinner" style="display: none;">
             <i class="fas fa-spinner fa-spin"></i>
         </div>
-        <div id="result"></div>
+        <div id="result">
+            <p>Toutes vos séries sur RétroFlix</p>
+            <div class="series-container">
+                <ul class="ul-result"></ul>
+            </div>
+            <button class="scroll-left-button-results"><-</button>
+            <button class="scroll-right-button-results">-></button>
+            <p id="noResult" class="no-result"></p>
+        </div>
+        <div id="recommandations">
+            <p>Recommandés pour vous</p>
+            <div class="series-container">
+                <ul class="ul-result"></ul>
+            </div>
+            <button class="scroll-left-button-recommandations"><-</button>
+            <button class="scroll-right-button-recommandations">-></button>
+        </div>
     </div>
+    
     <script src="home.js"></script>
 
 </body>

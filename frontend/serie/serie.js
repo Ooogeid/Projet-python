@@ -1,6 +1,17 @@
 const urlParams = new URLSearchParams(window.location.search);
 const serieId = urlParams.get('id');
 
+window.addEventListener('DOMContentLoaded', function() {
+  // Récupérer l'URL de la page précédente
+  var previousPage = document.referrer;
+
+  // Modifier le lien de retour en fonction de l'URL précédente
+  var retourLink = document.getElementById('retour-link');
+  if (retourLink) {
+    retourLink.href = previousPage;
+  }
+});
+
 // Fonction pour effectuer une requête AJAX
 function makeRequest(url, method = 'GET', body = null) {
   return new Promise(function(resolve, reject) {
@@ -39,6 +50,9 @@ makeRequest(`../../backend/controller.php?id=${serieId}`)
     const img_series = document.getElementById('serie-image');
     img_series.setAttribute('src', "../img/img_series/" + serieId + ".jpg");
 
+    const img_series = document.getElementById('serie-image');
+    img_series.setAttribute('src', "../img/img_series/" + serieId + ".jpg");
+    
     // Faire une autre requête AJAX pour vérifier si la série est dans la liste
     return makeRequest('../../backend/controller.php?maListe');
   })
@@ -100,3 +114,4 @@ removeButton.addEventListener('click', function() {
       console.error('Erreur lors du retrait de la série :', error);
     });
 });
+

@@ -45,6 +45,10 @@ body, html {
     font-size: 1em;
 }
 
+.serie-img{
+    border-radius: 15px;
+}
+
 a {
     text-decoration: none;
     color: black;

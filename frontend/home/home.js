@@ -9,6 +9,21 @@ xhr.onload = function () {
         if (response.success && response.username) {
             // Une session est active, l'utilisateur est connecté
             document.getElementById('usernameDisplay').textContent = response.username;
+
+            const recommenderXhr = new XMLHttpRequest();
+            recommenderXhr.open('GET', '../../backend/controller.php?recommandation=true', true);
+            
+            recommenderXhr.onload = function () {
+                if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
+                    const recommandations = JSON.parse(recommenderXhr.responseText);
+                    displayRecommandations(recommandations);
+                } else {
+                    console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
+                }
+            };
+            
+            recommenderXhr.send();
+
         } else {
             // Pas de session active, redirigez vers la page de connexion
             window.location.href = '../login/login.html';
@@ -21,31 +36,81 @@ xhr.onload = function () {
 
 xhr.send();
 
-document.addEventListener('DOMContentLoaded', function() {
+function scrollLeft() {
+    const resultContainer = document.querySelector('#result .series-container');
+    resultContainer.classList.add('animated');
+    resultContainer.scrollLeft -= 800;
+}
 
-    const searchButton = document.getElementById('searchButton');
+function scrollRight() {
+    const resultContainer = document.querySelector('#result .series-container');
+    resultContainer.classList.add('animated');
+    resultContainer.scrollLeft += 800;
+}
+
+function scrollLeftRecommandations() {
+    const recommandationsContainer = document.querySelector('#recommandations .series-container');
+    recommandationsContainer.classList.add('animated');
+    recommandationsContainer.scrollLeft -= 800;
+}
+
+function scrollRightRecommandations() {
+    const recommandationsContainer = document.querySelector('#recommandations .series-container');
+    recommandationsContainer.classList.add('animated');
+    recommandationsContainer.scrollLeft += 800;
+}
+
+document.onreadystatechange = function () {
+    const spinner = document.getElementById('loading-spinner');
+    if (document.readyState === 'loading') {
+        // Le DOM n'est pas encore entièrement chargé, afficher le spinner
+        spinner.style.display = 'block';
+    } else if (document.readyState === 'interactive') {
+        // Le DOM est partiellement chargé, masquer le spinner
+        spinner.style.display = 'none';
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
     const inputElement = document.getElementById('credentials');
     const resultDiv = document.getElementById('result');
     const languageToggle = document.getElementById('languageToggle');
-
+    var selectedLanguage = localStorage.getItem('selectedLanguage');
+  
+    // Restaurer la langue sélectionnée
+    if (selectedLanguage === 'en') {
+        languageToggle.checked = true;
+    } else {
+        languageToggle.checked = false;
+    }
+  
     let xhr = null;
-
+  
     searchIcon.addEventListener('click', function(event) {
         performSearch(event);
     });
-
+  
     inputElement.addEventListener('keyup', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault(); // Empêche le comportement par défaut du formulaire
             performSearch(event);
         }
     });
-
+  
     languageToggle.addEventListener('change', function() {
         if (languageToggle.checked) {
             saveLanguageSelection('en');
         } else {
             saveLanguageSelection('fr'); // Par défaut la recherche est en français
+        }
+    });
+
+    // Réinitialiser la langue à "français" lors du retour sur la page d'accueil
+    window.addEventListener('pageshow', function(event) {
+        if (localStorage.getItem('selectedLanguage') !== 'fr') {
+            saveLanguageSelection('fr'); // Réinitialiser la langue à "français"
+            languageToggle.checked = false; // Décocher le bouton de bascule
+            console.log('Langue sélectionnée :', localStorage.getItem('selectedLanguage'));
         }
     });
 
@@ -87,32 +152,32 @@ document.addEventListener('DOMContentLoaded', function() {
     function performSearch(event) {
         event.preventDefault();
         const keyword = inputElement.value;
-
+    
         // Annulez la requête précédente si elle est en cours
         if (xhr && xhr.readyState !== 4) {
             xhr.abort();
         }
-
+    
         if (keyword) {
             // Affichez le spinner pendant le chargement
             const spinner = document.querySelector('.loading-spinner');
             spinner.style.display = 'block';
-
+    
             xhr = new XMLHttpRequest();
             xhr.open('POST', '../../backend/controller.php', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
-
+    
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
-                    displayResults(response['series']); 
+                    displayResults(response['series'], true);
                     // Masquez le spinner et réactivez le bouton de recherche
                     spinner.style.display = 'none';
-                    searchButton.disabled = false;
                 }
             };
-            const selectedLanguage = localStorage.getItem("selectedLanguage");
-
+    
+            const selectedLanguage = localStorage.getItem('selectedLanguage');
+    
             const credentials = {
                 keyword: keyword,
                 language: selectedLanguage 
@@ -123,30 +188,60 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function displayResults(results) {
+    function displayResults(results, isSearch) {
+        const resultDiv = document.getElementById('result');
+        const ulResult = resultDiv.querySelector('.ul-result');
         let html = '';
-        if (results.length > 0) {
-            html += '<ul class="ul-result">';
-            results.forEach(function(result) {
-                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">' +
-            '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">' +
-            '<p style="margin-top: 20px;">' + result.titre + '</p>' + '</a></li>';
-            });
-            html += '</ul>';
-        } else {
-            html += 'Aucun résultat trouvé.';
-        }
-        resultDiv.innerHTML = html;
-    }
+        const noResult = document.getElementById('noResult');
+        noResult.textContent = ''; // Effacer le contenu du paragraphe
+        noResult.style.display = 'none'; // Masquer le message
 
+        if (results.length > 0) {
+            results.forEach(function(result) {
+                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
+                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+                html += '</a></li>';
+            });
+            noResult.style.display = 'none';
+        } else {
+            noResult.textContent = 'Aucun résultat trouvé.'; // Modifier le texte du paragraphe
+            noResult.style.display = 'flex';
+            noResult.style.justifyContent = 'center';
+        }
+      
+        if (isSearch) {
+            resultDiv.classList.remove('series-container');
+            ulResult.classList.add('container');
+            resultDiv.querySelector('p').style.display = 'none';
+            resultDiv.querySelector('.scroll-left-button').style.display = 'none';
+            resultDiv.querySelector('.scroll-right-button').style.display = 'none';
+        }
+      
+        ulResult.innerHTML = html;
+      
+        const scrollLeftButton = resultDiv.querySelector('.scroll-left-button-results');
+        const scrollRightButton = resultDiv.querySelector('.scroll-right-button-results');
+      
+        scrollLeftButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        scrollRightButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+      
+        scrollLeftButton.classList.add('scroll-left-button');
+        scrollRightButton.classList.add('scroll-right-button');
+      
+        scrollLeftButton.addEventListener('click', scrollLeft);
+        scrollRightButton.addEventListener('click', scrollRight);
+    }
+    
     function getSeriesData() {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', '../../backend/controller.php', true);
+        const url = '../../backend/controller.php?'; // Inclure le paramètre de pagination dans l'URL
+    
+        xhr.open('GET', url, true);
     
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
-                displayResults(response); // Affichez les résultats en utilisant la fonction displayResults()
+                displayResults(response, false); // Afficher les résultats en utilisant la fonction displayResults()
             } else {
                 console.error('Erreur :', xhr.status, xhr.statusText);
             }
@@ -155,6 +250,38 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send();
     }
 
-    // Appel à la fonction pour récupérer les données des séries lors du chargement de la page
+    
     getSeriesData();
+
+
 });
+
+function displayRecommandations(recommandations) {
+    const recommandationsDiv = document.getElementById('recommandations');
+    const ulResult = recommandationsDiv.querySelector('.ul-result');
+
+    let recommandationsHTML = '';
+    const recommandationsArray = Object.values(recommandations);
+    recommandationsArray.forEach(function(recommandationArray) {
+        recommandationArray.forEach(function(recommandation) {
+            recommandationsHTML += '<li><a href="../serie/serie.html?id=' + recommandation.id + '" class="lien-serie">';
+            recommandationsHTML += '<img src="../img/img_series/' + recommandation.id + '.jpg" alt="' + recommandation.titre + '" class="img-series">';
+            recommandationsHTML += '<p style="margin-top: 20px;">' + recommandation.titre + '</p>';
+            recommandationsHTML += '</a></li>';
+        });
+    });
+
+    ulResult.innerHTML = recommandationsHTML;
+
+    const scrollLeftButton = recommandationsDiv.querySelector('.scroll-left-button-recommandations');
+    const scrollRightButton = recommandationsDiv.querySelector('.scroll-right-button-recommandations');
+
+    scrollLeftButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    scrollRightButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+
+    scrollLeftButton.classList.add('scroll-left-button');
+    scrollRightButton.classList.add('scroll-right-button');
+
+    scrollLeftButton.addEventListener('click', scrollLeftRecommandations);
+    scrollRightButton.addEventListener('click', scrollRightRecommandations);
+}
