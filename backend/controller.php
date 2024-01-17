@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             // récupération des données de la série pour le détail
             $serieData = $service->getSerieData($serieId);
             if ($serieData) {
-                $result['description'] = utf8_encode($serieData['description']);
+                $result['description'] = $serieData['description'];
                 $result['titre'] = $serieData['titre'];
             } else {
                 $result = ['error' => 'Série non trouvée'];
