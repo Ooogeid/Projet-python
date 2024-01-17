@@ -36,10 +36,11 @@ class SeriesService {
     
         // Lemmatisation des mots-clés
         $keywordsLemma = array_map([$this, 'lemmatize'], $keywordsArrayMinuscule);
-    
+
         // Recherche de séries dont le titre correspond au mot-clé (on ne lemmatise pas celui-ci)
         $titleMatches = $this->searchSeriesByTitle($keywordsArrayMinuscule);
-    
+
+
         return [
             'cleanedKeywords' => $cleanedKeywords,
             'keywordsArrayMinuscule' => $keywordsArrayMinuscule,
@@ -106,13 +107,15 @@ class SeriesService {
 
             // Langue française ou anglaise
             $table = ($language == 'fr') ? 'vf' : 'vo';
-            
             $query = "
                 SELECT s.id_serie as id, s.titre, av.poids AS poids
                 FROM serie s
                 JOIN apparition_$table av ON s.id_serie = av.id_serie
-                JOIN mots_$table mv ON av.id_mot_$table = mv.id_mot_$table
-                WHERE mv.Libelle = :keyword
+                WHERE 1
+                AND av.id_mot_$table = 
+                (SELECT mv.id_mot_$table 
+                FROM mots_$table mv
+                WHERE mv.Libelle LIKE :keyword LIMIT 1) 
                 ORDER BY poids DESC
                 LIMIT 20";
     
@@ -180,7 +183,7 @@ class SeriesService {
             SELECT s.id_serie as id, s.titre, av.poids AS poids
             FROM serie s
             JOIN apparition_vo av ON s.id_serie = av.id_serie
-            WHERE s.titre LIKE :keyword
+            WHERE LOWER(s.titre) LIKE LOWER(:keyword)
             ORDER BY poids DESC
             LIMIT 20";
     
@@ -198,7 +201,7 @@ class SeriesService {
                 $matches = array_merge($matches, $result);
             }
         }
-    
+
         return $matches;
     }
     
@@ -221,6 +224,7 @@ class SeriesService {
         $stmt->bindParam(':id', $serieId, PDO::PARAM_INT);
         $stmt->execute();
         $serieData = $stmt->fetch(PDO::FETCH_ASSOC);
+        $serieData['description'] = utf8_decode($serieData['description']);
         return $serieData;
     }
     
@@ -294,6 +298,55 @@ class SeriesService {
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return $series;
     }
+
+    // Fonction pour récupérer les mots-clés importants des séries likés
+    public function getMalisteKeywords(){
+        $sql = "
+            SELECT mv.Libelle AS keyword
+            FROM serie s
+            JOIN apparition_vo av ON s.id_serie = av.id_serie
+            JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
+            JOIN likes l ON s.id_serie = l.id_serie
+            WHERE l.id_users = :user_id
+            GROUP BY mv.Libelle
+            ORDER BY av.poids DESC
+            LIMIT 40";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
+        $stmt->execute();
+        $keywords = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        
+        return $keywords;
+    }
+
+    public function recommandation(){
+        // Récupérer les mots clés des séries likées par l'utilisateur
+        $keywords = $this->getMalisteKeywords();
+        // Requête de recherche pour les séries recommandées
+        $query = "
+            SELECT s.id_serie AS id, s.titre, av.poids AS poids
+            FROM serie s
+            JOIN apparition_vo av ON s.id_serie = av.id_serie
+            JOIN mots_vo mv ON av.id_mot_vo = mv.id_mot_vo
+            LEFT JOIN (
+                SELECT id_serie
+                FROM likes
+                WHERE id_users = :user_id
+            ) l ON s.id_serie = l.id_serie
+            WHERE mv.Libelle IN ('" . implode("','", $keywords) . "')
+            AND l.id_serie IS NULL
+            ORDER BY poids DESC
+            LIMIT 10";
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        return $result;
+    }
+
 
 }
 ?>
