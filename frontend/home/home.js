@@ -9,14 +9,20 @@ xhr.onload = function () {
         if (response.success && response.username) {
             // Une session est active, l'utilisateur est connecté
             document.getElementById('usernameDisplay').textContent = response.username;
-
+            localStorage.setItem('username', response.username);
             const recommenderXhr = new XMLHttpRequest();
             recommenderXhr.open('GET', '../../backend/controller.php?recommandation=true', true);
             
             recommenderXhr.onload = function () {
                 if (recommenderXhr.status >= 200 && recommenderXhr.status < 300) {
                     const recommandations = JSON.parse(recommenderXhr.responseText);
-                    displayRecommandations(recommandations);
+                    if (recommandations.recommandation.length === 0) {
+                        noResultR = document.getElementById('noResultR');
+                        noResultR.textContent = 'Commencez à ajouter une série en liste pour être recommandé';
+                        displayRecommandations(recommandations);
+                    } else {
+                        displayRecommandations(recommandations);
+                    }
                 } else {
                     console.error('Erreur lors de la récupération des recommandations:', recommenderXhr.status, recommenderXhr.statusText);
                 }
@@ -73,7 +79,6 @@ document.onreadystatechange = function () {
 
 document.addEventListener('DOMContentLoaded', function() {
     const inputElement = document.getElementById('credentials');
-    const resultDiv = document.getElementById('result');
     const languageToggle = document.getElementById('languageToggle');
     var selectedLanguage = localStorage.getItem('selectedLanguage');
   
@@ -110,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (localStorage.getItem('selectedLanguage') !== 'fr') {
             saveLanguageSelection('fr'); // Réinitialiser la langue à "français"
             languageToggle.checked = false; // Décocher le bouton de bascule
-            console.log('Langue sélectionnée :', localStorage.getItem('selectedLanguage'));
         }
     });
 
@@ -148,60 +152,67 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    let resultDiv = document.getElementById('result'); // Déclaration de resultDiv en dehors de la fonction
 
     function performSearch(event) {
         event.preventDefault();
         const keyword = inputElement.value;
-    
+
         // Annulez la requête précédente si elle est en cours
         if (xhr && xhr.readyState !== 4) {
             xhr.abort();
         }
-    
+        console.log(keyword);
         if (keyword) {
             // Affichez le spinner pendant le chargement
             const spinner = document.querySelector('.loading-spinner');
             spinner.style.display = 'block';
-    
+
             xhr = new XMLHttpRequest();
             xhr.open('POST', '../../backend/controller.php', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
-    
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    displayResults(response['series'], true);
-                    // Masquez le spinner et réactivez le bouton de recherche
-                    spinner.style.display = 'none';
-                }
+
+            xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                displayResults(response['series'], true);
+                // Masquez le spinner et réactivez le bouton de recherche
+                spinner.style.display = 'none';
+            }
             };
-    
+
             const selectedLanguage = localStorage.getItem('selectedLanguage');
-    
+
             const credentials = {
-                keyword: keyword,
-                language: selectedLanguage 
+            keyword: keyword,
+            language: selectedLanguage,
             };
             xhr.send(JSON.stringify(credentials)); // Envoyez l'objet JSON
+
+            resultDiv.style.display = 'block'; // Afficher resultDiv
+            const noKeyword = document.getElementById('noKeyword');
+            noKeyword.style.display = 'none'; // Masquer noKeyword
         } else {
-            resultDiv.innerHTML = 'Veuillez entrer un mot-clé.';
+            resultDiv.style.display = 'none'; // Masquer resultDiv
+            const noKeyword = document.getElementById('noKeyword');
+            noKeyword.style.display = 'block'; // Afficher noKeyword
         }
     }
 
     function displayResults(results, isSearch) {
-        const resultDiv = document.getElementById('result');
         const ulResult = resultDiv.querySelector('.ul-result');
         let html = '';
         const noResult = document.getElementById('noResult');
+
         noResult.textContent = ''; // Effacer le contenu du paragraphe
         noResult.style.display = 'none'; // Masquer le message
 
         if (results.length > 0) {
-            results.forEach(function(result) {
-                html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
-                html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
-                html += '<p style="margin-top: 20px;">' + result.titre + '</p>';
-                html += '</a></li>';
+            results.forEach(function (result) {
+            html += '<li><a href="../serie/serie.html?id=' + result.id + '" class="lien-serie">';
+            html += '<img src="../img/img_series/' + result.id + '.jpg" alt="' + result.titre + '" class="img-series">';
+            html += '<p style="margin-top: 20px;">' + result.titre + '</p>';
+            html += '</a></li>';
             });
             noResult.style.display = 'none';
         } else {
@@ -209,33 +220,33 @@ document.addEventListener('DOMContentLoaded', function() {
             noResult.style.display = 'flex';
             noResult.style.justifyContent = 'center';
         }
-      
+
         if (isSearch) {
-            resultDiv.classList.remove('series-container');
-            ulResult.classList.add('container');
+            resultDiv.classList.remove('container'); // Supprimer la classe 'container'
+            resultDiv.classList.add('series-container'); // Ajouter la classe 'series-container'
             resultDiv.querySelector('p').style.display = 'none';
             resultDiv.querySelector('.scroll-left-button').style.display = 'none';
             resultDiv.querySelector('.scroll-right-button').style.display = 'none';
         }
-      
+
         ulResult.innerHTML = html;
-      
+
         const scrollLeftButton = resultDiv.querySelector('.scroll-left-button-results');
         const scrollRightButton = resultDiv.querySelector('.scroll-right-button-results');
-      
+
         scrollLeftButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
         scrollRightButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-      
+
         scrollLeftButton.classList.add('scroll-left-button');
         scrollRightButton.classList.add('scroll-right-button');
-      
+
         scrollLeftButton.addEventListener('click', scrollLeft);
         scrollRightButton.addEventListener('click', scrollRight);
     }
     
     function getSeriesData() {
         const xhr = new XMLHttpRequest();
-        const url = '../../backend/controller.php?'; // Inclure le paramètre de pagination dans l'URL
+        const url = '../../backend/controller.php?'; 
     
         xhr.open('GET', url, true);
     
@@ -285,4 +296,9 @@ function displayRecommandations(recommandations) {
 
     scrollLeftButton.addEventListener('click', scrollLeftRecommandations);
     scrollRightButton.addEventListener('click', scrollRightRecommandations);
+
+    if(recommandations.recommandation.length === 0){
+        scrollLeftButton.style.display = 'none';
+        scrollRightButton.style.display = 'none';
+    }
 }

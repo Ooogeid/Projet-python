@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) {
             const response = JSON.parse(xhr.responseText);
+            document.getElementById('usernameDisplay').textContent = localStorage.getItem('username');
             displayResults(response);
         } else {
             console.error('Erreur :', xhr.status, xhr.statusText);

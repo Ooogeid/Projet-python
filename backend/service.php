@@ -305,6 +305,9 @@ class SeriesService {
     public function recommandation($userId) {
         $series = $this->getMaliste();
         $limit = count($series) * 20; // on limite à 20 fois le nombre de séries en liste
+        if($limit == 0){
+            return [];
+        }
 
         // Récupérer tous les mots-clés et leurs poids pour les séries en liste
         $sql = "
