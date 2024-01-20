@@ -201,7 +201,7 @@ class SeriesService {
         return $matches;
     }
     
-    // Fonction pour lemmatiser les mots grâce à une librairie externe (que en anglais pour l'instant)
+    // Fonction pour lemmatiser les mots grâce à une librairie externe (que en anglais)
     private static function lemmatize($word) {
         if (empty($word)) {
             return $word; 
@@ -282,9 +282,6 @@ class SeriesService {
         $stmt->bindParam(':user_id', $_SESSION['id_users'], PDO::PARAM_INT);
         $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // foreach ($series as &$serie) {
-        //     $serie['description'] = utf8_encode($serie['description']);
-        // }
         return $series;
     }
     
@@ -296,9 +293,6 @@ class SeriesService {
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $series = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // foreach ($series as &$serie) {
-        //     $serie['nom'] = utf8_encode($serie['nom']);
-        // }
         return $series;
     }
 
@@ -427,9 +421,6 @@ class SeriesService {
             $serieInfo['score'] = $score;
             $recommendedSeries[] = $serieInfo;
         }
-        // foreach ($recommendedSeries as &$serie) {
-        //     $serie['description'] = utf8_encode($serie['description']);
-        // }
         return $recommendedSeries;
     }
 
