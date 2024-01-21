@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $result = $series;
         }
         header('Content-Type: application/json');
-        echo json_encode($result);
+        echo json_encode($result, JSON_NUMERIC_CHECK);
     } catch (PDOException $e) {
         echo 'Erreur de connexion à la base de données : ' . $e->getMessage();
     }

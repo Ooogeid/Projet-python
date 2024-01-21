@@ -49,7 +49,7 @@ makeRequest(`../../backend/controller.php?id=${serieId}`)
 
     const img_series = document.getElementById('serie-image');
     img_series.setAttribute('src', "../img/img_series/" + serieId + ".jpg");
-    
+
     // Faire une autre requête AJAX pour vérifier si la série est dans la liste
     return makeRequest('../../backend/controller.php?maListe');
   })
@@ -57,8 +57,7 @@ makeRequest(`../../backend/controller.php?id=${serieId}`)
     const maListe = JSON.parse(responseText);
 
     // Comparez la série sélectionnée avec les séries de la liste
-    const serieEstDansLaListe = maListe.some(serie => serie.id === serieId);
-
+    const serieEstDansLaListe = maListe.some(serie => serie.id === parseInt(serieId));
     // Affichez ou masquez les boutons en fonction du résultat
     const removeButton = document.getElementById('remove');
     if (serieEstDansLaListe) {
