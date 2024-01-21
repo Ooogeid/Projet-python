@@ -225,8 +225,6 @@ document.addEventListener('DOMContentLoaded', function() {
             resultDiv.classList.remove('container'); // Supprimer la classe 'container'
             resultDiv.classList.add('series-container'); // Ajouter la classe 'series-container'
             resultDiv.querySelector('p').style.display = 'none';
-            resultDiv.querySelector('.scroll-left-button').style.display = 'none';
-            resultDiv.querySelector('.scroll-right-button').style.display = 'none';
         }
 
         ulResult.innerHTML = html;
